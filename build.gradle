@@ -44,6 +44,18 @@ project.ext {
     compileSdkVersion = 35
     buildToolsVersion = "35.0.0"
 }
+subprojects {
+    afterEvaluate {
+        if (plugins.hasPlugin('kotlin-android')) {
+            android {
+                kotlinOptions {
+                    jvmTarget = '17'
+                }
+            }
+        }
+    }
+}
+
 tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
