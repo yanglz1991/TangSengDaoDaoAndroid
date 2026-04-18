@@ -59,7 +59,7 @@ public class PlayVideoActivity extends GSYBaseActivityDetail<VideoPlayer> {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.act_play_video_layout);
+        setContentView(R.layout.act_play_video_base_layout);
 
         detailPlayer = findViewById(R.id.player);
         //增加title

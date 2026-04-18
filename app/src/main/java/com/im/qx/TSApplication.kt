@@ -32,6 +32,7 @@ import com.chat.login.WKLoginApplication
 import com.chat.push.WKPushApplication
 import com.chat.scan.WKScanApplication
 import com.chat.uikit.TabActivity
+import com.chat.video.WKVideoApplication
 import com.chat.uikit.WKUIKitApplication
 import com.chat.uikit.chat.manager.WKIMUtils
 import com.chat.uikit.user.service.UserModel
@@ -41,6 +42,9 @@ import kotlin.system.exitProcess
 class TSApplication : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
+
+        WKVideoApplication.getInstance().init(this)
+
         val processName = getProcessName(this, Process.myPid())
         if (processName != null) {
             val defaultProcess = processName == getAppPackageName()
@@ -109,7 +113,8 @@ class TSApplication : MultiDexApplication() {
     private fun initApi() {
         var apiURL = WKSharedPreferencesUtil.getInstance().getSP("api_base_url")
         if (TextUtils.isEmpty(apiURL)) {
-            apiURL = "http://qx.qhfhasina.com:8090"
+            // apiURL = "http://qx.qhfhasina.com:8090"
+            apiURL = "http://10.0.2.2:8090"
             WKApiConfig.initBaseURL(apiURL)
         } else {
             WKApiConfig.initBaseURLIncludeIP(apiURL)
