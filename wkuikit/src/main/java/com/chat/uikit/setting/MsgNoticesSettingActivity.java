@@ -99,8 +99,8 @@ public class MsgNoticesSettingActivity extends WKBaseActivity<ActMsgNoticesSetLa
         wkVBinding.openNoticeLayout.setOnClickListener(v -> {
             WKOSUtils.openChannelSetting(this, WKConstants.newMsgChannelID);
         });
-        wkVBinding.openRTCNoticeLayout.setOnClickListener(v -> {
-            WKOSUtils.openChannelSetting(this, WKConstants.newRTCChannelID);
-        });
+        // wkVBinding.openRTCNoticeLayout.setOnClickListener(v -> {
+        //     WKOSUtils.openChannelSetting(this, WKConstants.newRTCChannelID);
+        // });
     }
 }
