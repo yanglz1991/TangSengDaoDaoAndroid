@@ -118,6 +118,7 @@ dependencies {
     implementation project(path: ':wklogin')
     implementation project(path: ':wkscan')
     implementation project(path: ':wkpush')
+    implementation project(path: ':wkgroupmanage')
     implementation project(path: ':MyLibs:wkvideo')
     // 必须加这个，解决 SpinKitView 资源找不到
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
