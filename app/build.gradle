@@ -70,7 +70,10 @@ android {
             abiFilters "armeabi-v7a", "arm64-v8a"
 //            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86'
         }
-
+        // 高德地图API Key
+        manifestPlaceholders = [
+            AMAP_API_KEY: project.properties['AMAP_API_KEY'] ?: ''
+        ]
     }
 
     buildTypes {
@@ -80,7 +83,7 @@ android {
             minifyEnabled true  // 是否混淆
             shrinkResources true  // 是否去除无效的资源文件
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-           // signingConfig signingConfigs.release
+            // signingConfig signingConfigs.release
         }
         debug {
 //            jniDebuggable true
@@ -88,7 +91,7 @@ android {
 //            minifyEnabled true  // 是否混淆
 //            shrinkResources true  // 是否去除无效的资源文件
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-           // signingConfig signingConfigs.release
+            // signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -118,9 +121,24 @@ dependencies {
     implementation project(path: ':wklogin')
     implementation project(path: ':wkscan')
     implementation project(path: ':wkpush')
-    implementation project(path: ':wkgroupmanage')
-    implementation project(path: ':MyLibs:wkvideo')
-    // 必须加这个，解决 SpinKitView 资源找不到
-    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
-    implementation 'com.github.a365344743s:MediaCompressTelegram:1.0.0' //video增加media依赖
+    //*商业模块*
+
+    implementation project(path: ':wkfile')//文件模块
+    implementation project(path: ':wkgroupmanage')//群管模块
+    implementation project(path: ':wkvideo')//视频模块
+    
+    // implementation project(path: ':wkKeepAlive')//保活
+    // implementation project(path: ':wkmoments')//朋友圈
+    // implementation project(path: ':wkfavorite')//收藏
+    // implementation project(path: ':wkrtc')//音视频模块
+    // implementation project(path: ':wksecurity')//安全隐私
+    // implementation project(path: ':wkadvanced')//旗舰模块
+    // implementation project(path: ':wkimageeditor')//图片编辑模块
+    // implementation project(path: ':wkricheditor')//富文本模块
+    // implementation project(path: ':wkpinnedmessage')//消息置顶模块
+    // implementation project(path: ':wksticker')//sticker动画模块
+    // implementation project(path: ':wkcustomerservice')//客服模块
+    // implementation project(path: ':label')//标签模块
+    // implementation project(path: ':wkwallet')//钱包红包模块
+    // implementation project(path: ':wkmap')//地图位置模块
 }

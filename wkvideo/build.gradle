@@ -1,16 +1,13 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-parcelize'
 apply plugin: 'maven-publish'
-apply plugin: 'org.jetbrains.kotlin.android'
 
 afterEvaluate {
     publishing {
         publications {
             maven(MavenPublication) {
                 afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) }
-                groupId = 'com.xinbida.groupmanager'
-                artifactId = 'WKGroupManager_loca'
+                groupId = 'com.xinbida.video'
+                artifactId = 'WKVideo_loca'
                 version = '1.0.0'
             }
         }
@@ -21,6 +18,7 @@ afterEvaluate {
         }
     }
 }
+
 android {
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
@@ -33,24 +31,33 @@ android {
 
     buildTypes {
         release {
-            zipAlignEnabled true
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
     buildFeatures {
         viewBinding true
     }
-    namespace 'com.chat.groupmanage'
+    namespace 'com.chat.video'
+}
+
+repositories {
+//    flatDir {
+//        dirs '../base/libs', 'libs'
+//    }
 }
 dependencies {
-   implementation project(':wkbase')
-//    implementation 'androidx.core:core-ktx:+'
+    //视频录制
+    // implementation 'cjt.library.wheel:camera:1.1.9'
+    implementation 'com.github.a365344743s:MediaCompressTelegram:1.0.0'
+    //视频播放
+//    implementation 'com.github.CarGuo.GSYVideoPlayer:GSYVideoPlayer:v8.4.0-release-jitpack'
+//    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyvideoplayer-java:v10.0.0'
+//    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyvideoplayer-exo2:v10.0.0'
+    api project(':wkbase')
 }

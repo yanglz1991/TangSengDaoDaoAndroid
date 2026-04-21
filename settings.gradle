@@ -28,5 +28,6 @@ include ':wkuikit'
 include ':wkscan'
 include ':wklogin'
 include ':wkpush'
-include ':wkgroupmanage'
-include ':MyLibs:wkvideo'
+include ':wkfile'//文件模块
+include ':wkgroupmanage'//群管模块
+include ':wkvideo'//视频模块

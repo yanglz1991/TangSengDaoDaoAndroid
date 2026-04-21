@@ -37,17 +37,13 @@ import com.chat.uikit.chat.manager.WKIMUtils
 import com.chat.uikit.user.service.UserModel
 import com.chat.groupmanage.WKGroupManageApplication
 import com.chat.video.WKVideoApplication
+import com.chat.file.WKFileApplication
 import com.im.qx.R
 import kotlin.system.exitProcess
 
 class TSApplication : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
-
-        // 引入视频模块
-        WKVideoApplication.getInstance().init(this)
-        // 引入群管理模块
-        WKGroupManageApplication.getInstance().init()
 
         val processName = getProcessName(this, Process.myPid())
         if (processName != null) {
@@ -110,6 +106,11 @@ class TSApplication : MultiDexApplication() {
         WKScanApplication.getInstance().init(this)
         WKUIKitApplication.getInstance().init(this)
         WKPushApplication.getInstance().init(getAppPackageName(), this)
+        
+        WKGroupManageApplication.getInstance().init();//群管模块
+        WKVideoApplication.getInstance().init(this);//视频模块
+        WKFileApplication.getInstance().init(this);//文件模块
+
         addAppFrontBack()
         addListener()
     }

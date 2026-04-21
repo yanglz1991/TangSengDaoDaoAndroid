@@ -2,15 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'maven-publish'
-apply plugin: 'org.jetbrains.kotlin.android'
 
 afterEvaluate {
     publishing {
         publications {
             maven(MavenPublication) {
                 afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) }
-                groupId = 'com.xinbida.groupmanager'
-                artifactId = 'WKGroupManager_loca'
+                groupId = 'com.xinbida.file'
+                artifactId = 'WKFile_loca'
                 version = '1.0.0'
             }
         }
@@ -21,6 +20,7 @@ afterEvaluate {
         }
     }
 }
+
 android {
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
@@ -38,6 +38,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -48,9 +49,9 @@ android {
     buildFeatures {
         viewBinding true
     }
-    namespace 'com.chat.groupmanage'
+    namespace 'com.chat.file'
 }
+
 dependencies {
-   implementation project(':wkbase')
-//    implementation 'androidx.core:core-ktx:+'
+    api project(':wkbase')
 }
