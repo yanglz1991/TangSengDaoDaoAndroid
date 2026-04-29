@@ -68,9 +68,13 @@ public class DownloadApkUtils {
         localFiles = new File(downloadPath, context.getPackageName() + versionName + ".apk");
         boolean isoknew = getAPKInfo(context, versionName, localFiles);
         if (isoknew && null != localFiles && localFiles.exists()) {
-            //文件存在，检测了直接安装
+            //文件存在且严格新于已安装版本，直接安装
             installAPK(localFiles);
         } else {
+            // 缓存校验失败：可能是版本不匹配/旧版本/损坏文件，清理脏缓存避免下次再被命中
+            if (localFiles != null && localFiles.exists()) {
+                WKFileUtils.delFileOrFolder(localFiles);
+            }
             if (isdownload) {
                 WKToastUtils.getInstance().showToastNormal("下载任务已经存在，可在通知栏中查看状态");
                 return;
@@ -174,22 +178,38 @@ public class DownloadApkUtils {
 
 
     /**
-     * 检测本地apk 包是否正确
+     * 检测本地apk 包是否正确：
+     * 1. 缓存 APK 的 versionName 必须等于服务器下发的版本（避免命中无关同名残留文件）。
+     * 2. 缓存 APK 的 versionCode 必须严格大于已安装应用的 versionCode，才允许跳过下载直接安装；
+     *    否则视为脏缓存，应当删除并重新下载，避免出现"安装完仍是原来的版本"。
      */
     private static boolean getAPKInfo(Context context, String version, File apk_folder) {
         if (!apk_folder.exists()) {
             return false;
         }
         try {
-            PackageInfo pkgInfo = null;
-            pkgInfo = context.getPackageManager().
-                    getPackageArchiveInfo(apk_folder.getAbsolutePath(), PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES);
-            int appVersionCode = Integer.valueOf(pkgInfo.versionName.replaceAll("\\.", ""));
-            int netVersion = Integer.valueOf(version.replaceAll("\\.", "").trim());
-            if (netVersion >= appVersionCode) {
-                //服务器的版本号等于下载的apk的版本号，可更新
-                return true;
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pkgInfo = pm.getPackageArchiveInfo(apk_folder.getAbsolutePath(),
+                    PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES);
+            if (pkgInfo == null || TextUtils.isEmpty(pkgInfo.versionName)) {
+                return false;
             }
+            // 1) 文件版本必须与服务器下发版本完全一致
+            if (!TextUtils.equals(pkgInfo.versionName, version)) {
+                return false;
+            }
+            // 2) 缓存 APK 的 versionCode 必须大于当前已安装应用的 versionCode
+            PackageInfo currentInfo = pm.getPackageInfo(context.getPackageName(), 0);
+            long apkCode;
+            long currentCode;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                apkCode = pkgInfo.getLongVersionCode();
+                currentCode = currentInfo.getLongVersionCode();
+            } else {
+                apkCode = pkgInfo.versionCode;
+                currentCode = currentInfo.versionCode;
+            }
+            return apkCode > currentCode;
         } catch (Exception e) {
             e.printStackTrace();
         }

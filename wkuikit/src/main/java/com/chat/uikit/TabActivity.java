@@ -139,7 +139,8 @@ public class TabActivity extends WKBaseActivity<ActTabMainBinding> {
         wkVBinding.vp.setAdapter(new WKFragmentStateAdapter(this, fragments));
         WKCommonModel.getInstance().getAppNewVersion(false, version -> {
             String v = WKDeviceUtils.getInstance().getVersionName(TabActivity.this);
-            if (version != null && !TextUtils.isEmpty(version.download_url) && !version.app_version.equals(v)) {
+            if (version != null && !TextUtils.isEmpty(version.download_url)
+                    && WKDeviceUtils.isRemoteVersionNewer(version.app_version, v)) {
                 WKDialogUtils.getInstance().showNewVersionDialog(TabActivity.this, version);
             }
         });
@@ -388,4 +389,5 @@ public class TabActivity extends WKBaseActivity<ActTabMainBinding> {
         super.finish();
         EndpointManager.getInstance().remove("tab_activity");
     }
+
 }

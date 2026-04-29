@@ -34,10 +34,10 @@ public class WKAboutActivity extends WKBaseActivity<ActAboutLayoutBinding> {
     @Override
     protected void initView() {
 
-        SingleClickUtil.onSingleClick(wkVBinding.icpTV, view1 -> {
-            // 隐私政策
-            showWebView("https://beian.miit.gov.cn/#/home");
-        });
+        // SingleClickUtil.onSingleClick(wkVBinding.icpTV, view1 -> {
+        //     // 隐私政策
+        //     showWebView("https://beian.miit.gov.cn/#/home");
+        // });
         SingleClickUtil.onSingleClick(wkVBinding.privacyPolicyLayout, view1 -> {
             // 隐私政策
             showWebView(WKApiConfig.baseWebUrl + "privacy_policy.html");
@@ -61,7 +61,11 @@ public class WKAboutActivity extends WKBaseActivity<ActAboutLayoutBinding> {
 
     private void checkNewVersion(boolean isShowDialog) {
         WKCommonModel.getInstance().getAppNewVersion(isShowDialog, version -> {
-            if (version != null && !TextUtils.isEmpty(version.download_url)) {
+            String localV = WKDeviceUtils.getInstance().getVersionName(WKAboutActivity.this);
+            boolean hasNewer = version != null
+                    && !TextUtils.isEmpty(version.download_url)
+                    && WKDeviceUtils.isRemoteVersionNewer(version.app_version, localV);
+            if (hasNewer) {
                 if (isShowDialog) {
                     WKDialogUtils.getInstance().showNewVersionDialog(WKAboutActivity.this, version);
                 } else {
@@ -69,9 +73,11 @@ public class WKAboutActivity extends WKBaseActivity<ActAboutLayoutBinding> {
                 }
             } else {
                 wkVBinding.newVersionIv.setVisibility(View.GONE);
+                if (isShowDialog) {
+                    showToast(getString(com.chat.base.R.string.is_new_version));
+                }
             }
         });
     }
-
 
 }

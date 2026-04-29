@@ -380,6 +380,31 @@ public class WKDeviceUtils {
         return "";
     }
 
+    /**
+     * 判断 remote 版本号是否严格新于 local 版本号。
+     * 支持 "1.2"、"1.10"、"1.2.3" 等多段版本号；按段比较，缺失段补 0。
+     * 任一参数为空或解析失败返回 false。
+     */
+    public static boolean isRemoteVersionNewer(String remote, String local) {
+        if (TextUtils.isEmpty(remote) || TextUtils.isEmpty(local)) {
+            return false;
+        }
+        try {
+            String[] r = remote.trim().split("\\.");
+            String[] l = local.trim().split("\\.");
+            int len = Math.max(r.length, l.length);
+            for (int i = 0; i < len; i++) {
+                int rv = i < r.length ? Integer.parseInt(r[i]) : 0;
+                int lv = i < l.length ? Integer.parseInt(l[i]) : 0;
+                if (rv > lv) return true;
+                if (rv < lv) return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return false;
+    }
+
     public void installApk(Context context, String downloadApk) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         File file = new File(downloadApk);

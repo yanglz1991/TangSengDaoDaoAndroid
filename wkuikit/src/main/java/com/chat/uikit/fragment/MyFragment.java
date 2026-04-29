@@ -11,6 +11,7 @@ import com.chat.base.endpoint.EndpointManager;
 import com.chat.base.endpoint.entity.PersonalInfoMenu;
 import com.chat.base.net.HttpResponseCode;
 import com.chat.base.ui.Theme;
+import com.chat.base.utils.WKDeviceUtils;
 import com.chat.base.utils.WKLogUtils;
 import com.chat.base.utils.WKReader;
 import com.chat.base.utils.singleclick.SingleClickUtil;
@@ -95,7 +96,11 @@ public class MyFragment extends WKBaseFragment<FragMyLayoutBinding> {
                         }
                     }
                     if (index != -1) {
-                        if (version != null && !TextUtils.isEmpty(version.download_url)) {
+                        String localV = WKDeviceUtils.getInstance().getVersionName(getContext());
+                        boolean hasNewer = version != null
+                                && !TextUtils.isEmpty(version.download_url)
+                                && WKDeviceUtils.isRemoteVersionNewer(version.app_version, localV);
+                        if (hasNewer) {
                             if (!adapter.getData().get(index).isNewVersionIv) {
                                 adapter.getData().get(index).setIsNewVersionIv(true);
                                 adapter.notifyItemChanged(index);
