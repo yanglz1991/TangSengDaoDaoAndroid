@@ -61,7 +61,9 @@ public class PlayVideoActivity extends GSYBaseActivityDetail<VideoPlayer> {
         detailPlayer = findViewById(R.id.player);
         //增加title
         detailPlayer.getTitleTextView().setVisibility(View.GONE);
-        detailPlayer.getBackButton().setVisibility(View.GONE);
+        // 显示返回按钮以便用户退出全屏播放页
+        detailPlayer.getBackButton().setVisibility(View.VISIBLE);
+        detailPlayer.getBackButton().setOnClickListener(v -> finish());
         initView();
         initVideoBuilderMode();
         detailPlayer.startPlayLogic();
