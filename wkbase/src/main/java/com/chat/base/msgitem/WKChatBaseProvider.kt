@@ -513,13 +513,9 @@ abstract class WKChatBaseProvider : BaseItemProvider<WKUIChatMsgItemEntity>() {
                     showName = uiChatMsgItemEntity.wkMsg.memberOfFrom.memberName
                 }
             }
-            val os = getMsgOS(uiChatMsgItemEntity.wkMsg.clientMsgNO)
+            // 关闭消息来源后缀（不再显示 名字/设备）
             if (receivedNameTv.tag is String && receivedNameTv.tag == uiChatMsgItemEntity.wkMsg.fromUID) {
-                if (uiChatMsgItemEntity.wkMsg.type == WKContentType.typing) {
-                    receivedNameTv.text = showName
-                } else {
-                    receivedNameTv.text = String.format("%s/%s", showName, os)
-                }
+                receivedNameTv.text = showName
             }
 
 

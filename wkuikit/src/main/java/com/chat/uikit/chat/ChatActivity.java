@@ -645,7 +645,11 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
                 if (channel.channelType == WKChannelType.PERSONAL) {
                     setOnlineView(channel);
                 } else {
-                    if (channel.remoteExtraMap != null) {
+                    boolean isGroupAdmin = isGroupManagerOrCreator();
+                    if (!isGroupAdmin) {
+                        wkVBinding.topLayout.subtitleTv.setText("");
+                        wkVBinding.topLayout.subtitleCountTv.setVisibility(View.GONE);
+                    } else if (channel.remoteExtraMap != null) {
                         Object memberCountObject = channel.remoteExtraMap.get(WKChannelCustomerExtras.memberCount);
                         if (memberCountObject instanceof Integer) {
                             int count = (int) memberCountObject;
@@ -726,7 +730,11 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
             if (WKReader.isNotEmpty(list) && !TextUtils.isEmpty(list.get(0).channelID) && list.get(0).channelID.equals(channelId) && list.get(0).channelType == channelType) {
                 if (groupType == WKGroupType.normalGroup) {
                     count = WKIM.getInstance().getChannelMembersManager().getMemberCount(channelId, channelType);
-                    wkVBinding.topLayout.subtitleTv.setText(String.format(getString(R.string.group_member), count));
+                    if (isGroupManagerOrCreator()) {
+                        wkVBinding.topLayout.subtitleTv.setText(String.format(getString(R.string.group_member), count));
+                    } else {
+                        wkVBinding.topLayout.subtitleTv.setText("");
+                    }
                 }
                 //查询登录用户是否在本群
                 checkLoginUserInGroupStatus();
@@ -737,7 +745,11 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
         WKIM.getInstance().getChannelMembersManager().addOnAddChannelMemberListener(channelId, list -> {
             if (WKReader.isNotEmpty(list) && !TextUtils.isEmpty(list.get(0).channelID) && list.get(0).channelID.equals(channelId) && list.get(0).channelType == channelType && groupType == WKGroupType.normalGroup) {
                 count = WKIM.getInstance().getChannelMembersManager().getMemberCount(channelId, channelType);
-                wkVBinding.topLayout.subtitleTv.setText(String.format(getString(R.string.group_member), count));
+                if (isGroupManagerOrCreator()) {
+                    wkVBinding.topLayout.subtitleTv.setText(String.format(getString(R.string.group_member), count));
+                } else {
+                    wkVBinding.topLayout.subtitleTv.setText("");
+                }
                 WKRobotModel.getInstance().syncRobotData(getChatChannelInfo());
                 checkLoginUserInGroupStatus();
             }
@@ -1032,10 +1044,15 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
 
             WKChannelMember member = WKIM.getInstance().getChannelMembersManager().getMember(channelId, channelType, loginUID);
             hideOrShowRightView(member == null || member.isDeleted == 0);
+            boolean isGroupAdmin = member != null && member.role != WKChannelMemberRole.normal;
             if (groupType == WKGroupType.normalGroup) {
-                wkVBinding.topLayout.subtitleTv.setText(String.format(getString(R.string.group_member), count));
+                if (isGroupAdmin) {
+                    wkVBinding.topLayout.subtitleTv.setText(String.format(getString(R.string.group_member), count));
+                } else {
+                    wkVBinding.topLayout.subtitleTv.setText("");
+                }
             }
-            wkVBinding.topLayout.subtitleView.setVisibility(View.VISIBLE);
+            wkVBinding.topLayout.subtitleView.setVisibility(isGroupAdmin ? View.VISIBLE : View.GONE);
             chatPanelManager.showOrHideForbiddenView();
         } else {
             hideOrShowRightView(true);
@@ -1111,9 +1128,11 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
     private void getChannelState() {
         WKCommonModel.getInstance().getChannelState(channelId, channelType, channelState -> {
             if (channelState != null) {
-                if (channelType == WKChannelType.GROUP && channelState.online_count > 0) {
+                if (channelType == WKChannelType.GROUP && channelState.online_count > 0 && isGroupManagerOrCreator()) {
                     wkVBinding.topLayout.subtitleCountTv.setVisibility(View.VISIBLE);
                     wkVBinding.topLayout.subtitleCountTv.setText(String.format(getString(R.string.online_count), channelState.online_count));
+                } else if (channelType == WKChannelType.GROUP) {
+                    wkVBinding.topLayout.subtitleCountTv.setVisibility(View.GONE);
                 }
                 if (channelType == WKChannelType.PERSONAL) {
                     return;
@@ -1903,27 +1922,15 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
     }
 
     private void setOnlineView(WKChannel channel) {
-        if (channel.online == 1) {
-            String device = getString(R.string.phone);
-            if (channel.deviceFlag == UserOnlineStatus.Web) device = getString(R.string.web);
-            else if (channel.deviceFlag == UserOnlineStatus.PC) device = getString(R.string.pc);
-            String content = String.format("%s%s", device, getString(R.string.online));
-            wkVBinding.topLayout.subtitleTv.setText(content);
-            wkVBinding.topLayout.subtitleView.setVisibility(View.VISIBLE);
-        } else {
-            if (channel.lastOffline > 0) {
-                String showTime = WKTimeUtils.getInstance().getOnlineTime(channel.lastOffline);
-                if (TextUtils.isEmpty(showTime)) {
-                    wkVBinding.topLayout.subtitleView.setVisibility(View.VISIBLE);
-                    String time = WKTimeUtils.getInstance().getShowDateAndMinute(channel.lastOffline * 1000L);
-                    String content = String.format("%s%s", getString(R.string.last_seen_time), time);
-                    wkVBinding.topLayout.subtitleTv.setText(content);
-                } else {
-                    wkVBinding.topLayout.subtitleTv.setText(showTime);
-                    wkVBinding.topLayout.subtitleView.setVisibility(View.VISIBLE);
-                }
-            } else wkVBinding.topLayout.subtitleView.setVisibility(View.GONE);
-        }
+        // 手机端不显示设备在线状态
+        wkVBinding.topLayout.subtitleView.setVisibility(View.GONE);
+    }
+
+    private boolean isGroupManagerOrCreator() {
+        if (channelType != WKChannelType.GROUP) return false;
+        WKChannelMember member = WKIM.getInstance().getChannelMembersManager()
+                .getMember(channelId, channelType, WKConfig.getInstance().getUid());
+        return member != null && member.role != WKChannelMemberRole.normal;
     }
 
     @Override

@@ -130,34 +130,8 @@ public class UserDetailActivity extends WKBaseActivity<ActUserDetailLayoutBindin
                 wkVBinding.inGroupNameLayout.setVisibility(View.VISIBLE);
                 wkVBinding.inGroupNameTv.setText(member.memberRemark);
             }
-            if (member != null && !TextUtils.isEmpty(member.memberInviteUID) && member.isDeleted == 0) {
-                String name = "";
-                WKChannel channel = WKIM.getInstance().getChannelManager().getChannel(member.memberInviteUID, WKChannelType.PERSONAL);
-                if (channel != null) {
-                    name = TextUtils.isEmpty(channel.channelRemark) ? channel.channelName : channel.channelRemark;
-                }
-                if (TextUtils.isEmpty(name)) {
-                    WKChannelMember member1 = WKIM.getInstance().getChannelMembersManager().getMember(groupID, WKChannelType.GROUP, member.memberInviteUID);
-                    if (member1 != null) {
-                        name = TextUtils.isEmpty(member1.memberRemark) ? member1.memberName : member1.memberRemark;
-                    }
-                }
-                if (!TextUtils.isEmpty(name)) {
-                    wkVBinding.joinGroupWayLayout.setVisibility(View.VISIBLE);
-                    String showTime = "";
-                    if (!TextUtils.isEmpty(member.createdAt) && member.createdAt.contains(" ")) {
-                        showTime = member.createdAt.split(" ")[0];
-                    }
-                    String content = String.format("%s %s", showTime, String.format(getString(R.string.invite_join_group), name));
-                    wkVBinding.joinGroupWayTv.setText(content);
-                    int index = content.indexOf(name);
-                    SpannableString span = new SpannableString(content);
-                    span.setSpan(new NormalClickableSpan(false, Theme.colorAccount, new NormalClickableContent(NormalClickableContent.NormalClickableTypes.Other, ""), view -> {
-
-                    }), index, index + name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    wkVBinding.joinGroupWayTv.setText(span);
-                }
-            }
+            // 群成员资料页不显示进群方式和加入时间
+            wkVBinding.joinGroupWayLayout.setVisibility(View.GONE);
         } else {
             wkVBinding.joinGroupWayLayout.setVisibility(View.GONE);
         }
@@ -354,17 +328,8 @@ public class UserDetailActivity extends WKBaseActivity<ActUserDetailLayoutBindin
                         wkVBinding.applyBtn.setVisibility(View.GONE);
                     }
 
-                    if (!TextUtils.isEmpty(userInfo.join_group_invite_uid)){
-                        wkVBinding.joinGroupWayLayout.setVisibility(View.VISIBLE);
-                        String content = String.format("%s %s", userInfo.join_group_time, String.format(getString(R.string.invite_join_group), userInfo.join_group_invite_name));
-                        wkVBinding.joinGroupWayTv.setText(content);
-                        int index = content.indexOf(userInfo.join_group_invite_name);
-                        SpannableString span = new SpannableString(content);
-                        span.setSpan(new NormalClickableSpan(false, Theme.colorAccount, new NormalClickableContent(NormalClickableContent.NormalClickableTypes.Other, ""), view -> {
-
-                        }), index, index + userInfo.join_group_invite_name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        wkVBinding.joinGroupWayTv.setText(span);
-                    }
+                    // 群成员资料页不显示进群方式和加入时间
+                    wkVBinding.joinGroupWayLayout.setVisibility(View.GONE);
                 }
             } else {
                 showToast(msg);

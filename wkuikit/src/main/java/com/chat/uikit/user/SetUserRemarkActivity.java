@@ -47,8 +47,8 @@ public class SetUserRemarkActivity extends WKBaseActivity<ActUpdateUserRemarkLay
         uid = getIntent().getStringExtra("uid");
 
         if (!TextUtils.isEmpty(oldStr)) {
-            if (oldStr.length() > 10) {
-                oldStr = oldStr.substring(0, 10);
+            if (oldStr.length() > 30) {
+                oldStr = oldStr.substring(0, 30);
             }
             wkVBinding.contentEt.setText(oldStr);
             wkVBinding.contentEt.setSelection(oldStr.length());
@@ -56,8 +56,8 @@ public class SetUserRemarkActivity extends WKBaseActivity<ActUpdateUserRemarkLay
             WKChannel channel = WKIM.getInstance().getChannelManager().getChannel(uid, WKChannelType.PERSONAL);
             if (channel != null) {
                 String showName = TextUtils.isEmpty(channel.channelRemark) ? channel.channelName : channel.channelRemark;
-                if (showName.length() > 10) {
-                    showName = showName.substring(0, 10);
+                if (showName.length() > 30) {
+                    showName = showName.substring(0, 30);
                 }
                 wkVBinding.contentEt.setText(showName);
                 wkVBinding.contentEt.setSelection(showName.length());
@@ -113,7 +113,7 @@ public class SetUserRemarkActivity extends WKBaseActivity<ActUpdateUserRemarkLay
         SoftKeyboardUtils.getInstance().hideInput(this, wkVBinding.contentEt);
     }
 
-    int maxLength = 10;
+    int maxLength = 30;
     private final InputFilter filter = (src, start, end, dest, dstart, dend) -> {
         int dindex = 0;
         int count = 0;

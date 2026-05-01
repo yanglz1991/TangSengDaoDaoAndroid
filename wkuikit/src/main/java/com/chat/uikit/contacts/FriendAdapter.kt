@@ -140,32 +140,8 @@ class FriendAdapter :
                 )
             )
         }
-        if (item.channel.online == 1) {
-            holder.setGone(R.id.offlineTv, false)
-            var device: String? = context.getString(R.string.phone)
-            if (item.channel.deviceFlag == UserOnlineStatus.Web) device =
-                context.getString(R.string.web) else if (item.channel.deviceFlag == UserOnlineStatus.PC) device =
-                context.getString(R.string.pc)
-            val content = String.format("%s%s", device, context.getString(R.string.online))
-            holder.setText(R.id.offlineTv, content)
-        } else {
-            if (item.channel.lastOffline == 0L) {
-                holder.setGone(R.id.offlineTv, true)
-            } else {
-                val lastSeenTime =
-                    WKTimeUtils.getInstance().getOnlineTime(item.channel.lastOffline)
-                if (TextUtils.isEmpty(lastSeenTime)) {
-                    holder.setGone(R.id.offlineTv, false)
-                    val time = WKTimeUtils.getInstance()
-                        .getShowDateAndMinute(item.channel.lastOffline * 1000L)
-                    val content =
-                        String.format("%s %s", context.getString(R.string.last_seen_time), time)
-                    holder.setText(R.id.offlineTv, content)
-                } else {
-                    holder.setGone(R.id.offlineTv, true)
-                }
-            }
-        }
+        // 手机端不显示设备在线状态
+        holder.setGone(R.id.offlineTv, true)
         val list: MutableList<PopupMenuItem> = ArrayList()
         list.add(
             PopupMenuItem(

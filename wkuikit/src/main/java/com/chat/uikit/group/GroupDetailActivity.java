@@ -292,7 +292,8 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
                 }
             });
         });
-        wkVBinding.inGroupNameLayout.setOnClickListener(v -> updateNameInGroupDialog());
+        // 去掉"我在本群的昵称"入口
+        wkVBinding.inGroupNameLayout.setVisibility(View.GONE);
         SingleClickUtil.onSingleClick(wkVBinding.noticeLayout, view1 -> {
             if (!groupIsEnable()) return;
             String notice = "";
