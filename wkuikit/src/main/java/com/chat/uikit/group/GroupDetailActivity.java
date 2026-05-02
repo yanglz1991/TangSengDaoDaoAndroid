@@ -489,9 +489,8 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
                 wkVBinding.groupManageLayout.setVisibility(View.VISIBLE);
             }
             groupMemberAdapter.setList(temp);
-            if (list.size() >= 18) {
-                wkVBinding.showAllMembersTv.setVisibility(View.VISIBLE);
-            } else wkVBinding.showAllMembersTv.setVisibility(View.GONE);
+            // 始终显示「查看全部群成员」入口，便于通过搜索快速查找群成员
+            wkVBinding.showAllMembersTv.setVisibility(View.VISIBLE);
         }
     }
 
