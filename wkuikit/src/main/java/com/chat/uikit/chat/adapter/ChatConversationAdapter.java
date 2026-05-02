@@ -404,7 +404,9 @@ public class ChatConversationAdapter extends BaseQuickAdapter<ChatConversationMs
             } else {
                 avatarView.defaultAvatarTv.setVisibility(View.GONE);
                 avatarView.imageView.setVisibility(View.VISIBLE);
-                avatarView.showAvatar(item.getWkChannel(), true);
+                // 去掉聊天列表显示用户在线状态，保留以便后续恢复
+                // avatarView.showAvatar(item.getWkChannel(), true);
+                avatarView.showAvatar(item.getWkChannel(), false);
             }
             EndpointManager.getInstance().invoke("show_avatar_other_info", new AvatarOtherViewMenu(helper.getView(R.id.otherLayout), item.getWkChannel(), avatarView, false));
             isTop = item.getWkChannel().top == 1;
