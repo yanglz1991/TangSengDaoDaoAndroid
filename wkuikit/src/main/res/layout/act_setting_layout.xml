@@ -166,6 +166,7 @@
                     </LinearLayout>
 
                     <View
+                        android:id="@+id/dividerBeforeModule"
                         android:layout_width="match_parent"
                         android:layout_height="10dp"
                         android:visibility="visible"
@@ -184,6 +185,7 @@
                     </LinearLayout>
 
                     <View
+                        android:id="@+id/dividerBeforeThirdShare"
                         android:layout_width="match_parent"
                         android:layout_height="10dp"
                         android:background="@color/homeColor" />

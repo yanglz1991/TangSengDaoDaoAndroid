@@ -115,6 +115,16 @@ public class AvatarView extends FrameLayout {
 
     public void showAvatar(String channelID, byte channelType, String avatarCacheKey) {
         String url = getAvatarURL(channelID, channelType);
+        // 用户头像/名字更新后，其他人的列表和群聊不能及时刷新：
+        // 群成员适配器持有的 memberAvatarCacheKey 是过期的，Glide 会命中旧缓存。
+        // 这里统一优先使用 WKIM 中该频道最新的 avatarCacheKey，确保头像能自动刷新。
+        try {
+            WKChannel latestChannel = WKIM.getInstance().getChannelManager().getChannel(channelID, channelType);
+            if (latestChannel != null && !TextUtils.isEmpty(latestChannel.avatarCacheKey)) {
+                avatarCacheKey = latestChannel.avatarCacheKey;
+            }
+        } catch (Throwable ignored) {
+        }
         GlideUtils.getInstance().showAvatarImg(getContext(), url, avatarCacheKey, imageView);
     }
 

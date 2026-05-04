@@ -251,7 +251,8 @@ public class WKUIKitApplication {
             intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
             mContext.get().startActivity(intent);
         }));
-        EndpointManager.getInstance().setMethod("personal_center_web_login", EndpointCategory.personalCenter, 1000, object -> new PersonalInfoMenu(R.mipmap.icon_web_login, mContext.get().getString(R.string.web_login), () -> EndpointManager.getInstance().invoke("show_web_login_desc", mContext.get())));
+        // 隐藏 我的-电脑端登录 入口（如需放开请取消下面这行注释）
+        // EndpointManager.getInstance().setMethod("personal_center_web_login", EndpointCategory.personalCenter, 1000, object -> new PersonalInfoMenu(R.mipmap.icon_web_login, mContext.get().getString(R.string.web_login), () -> EndpointManager.getInstance().invoke("show_web_login_desc", mContext.get())));
 
         //添加通讯录
         EndpointManager.getInstance().setMethod(EndpointCategory.mailList + "_friends", EndpointCategory.mailList, 100, object -> new ContactsMenu("friend", R.mipmap.icon_new_friend, mContext.get().getString(R.string.new_friends), () -> {
@@ -301,7 +302,16 @@ public class WKUIKitApplication {
         });
         //添加聊天功能面板
         EndpointManager.getInstance().setMethod(EndpointCategory.chatFunction + "_chooseImg", EndpointCategory.chatFunction, 100, object -> new ChatFunctionMenu("chooseImg", R.mipmap.icon_func_album, mContext.get().getString(R.string.image), this::chooseIMG));
-        EndpointManager.getInstance().setMethod(EndpointCategory.chatFunction + "_chooseCard", EndpointCategory.chatFunction, 95, object -> new ChatFunctionMenu("chooseCard", R.mipmap.icon_func_card, mContext.get().getString(R.string.card), IConversationContext::sendCardMsg));
+        EndpointManager.getInstance().setMethod(EndpointCategory.chatFunction + "_chooseCard", EndpointCategory.chatFunction, 95, object -> {
+            // 群聊里禁止分享名片（如需放开请去掉下面 if 语句）
+            if (object instanceof IConversationContext) {
+                WKChannel chatChannel = ((IConversationContext) object).getChatChannelInfo();
+                if (chatChannel != null && chatChannel.channelType == WKChannelType.GROUP) {
+                    return null;
+                }
+            }
+            return new ChatFunctionMenu("chooseCard", R.mipmap.icon_func_card, mContext.get().getString(R.string.card), IConversationContext::sendCardMsg);
+        });
 
         //添加tab页
         EndpointManager.getInstance().setMethod(EndpointCategory.tabMenus + "_start_chat", EndpointCategory.tabMenus, 200, object -> new PopupMenuItem(mContext.get().getString(R.string.start_group_chat), R.mipmap.menu_chats, () -> {

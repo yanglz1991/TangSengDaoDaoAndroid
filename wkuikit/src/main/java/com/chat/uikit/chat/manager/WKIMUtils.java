@@ -310,6 +310,9 @@ public class WKIMUtils {
             String key = UUID.randomUUID().toString().replace("-", "");
             AvatarView.clearCache(s, b);
             WKIM.getInstance().getChannelManager().updateAvatarCacheKey(s, b, key);
+            // 主动拉取最新频道信息，触发 channelInfo 监听回调，
+            // 让会话列表 / 群聊 / 联系人列表等界面同步刷新昵称和头像。
+            WKIM.getInstance().getChannelManager().fetchChannelInfo(s, b);
         });
         //刷新群成员
         WKIM.getInstance().getChannelMembersManager().addOnSyncChannelMembers((channelID, channelType) -> {

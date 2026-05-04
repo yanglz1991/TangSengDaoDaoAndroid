@@ -132,6 +132,8 @@ public class UserDetailActivity extends WKBaseActivity<ActUserDetailLayoutBindin
             }
             // 群成员资料页不显示进群方式和加入时间
             wkVBinding.joinGroupWayLayout.setVisibility(View.GONE);
+            // 从群成员列表进入个人详情页不显示「设置备注」入口（如需放开请取消下面这行注释或将 GONE 改回 VISIBLE）
+            wkVBinding.remarkLayout.setVisibility(View.GONE);
         } else {
             wkVBinding.joinGroupWayLayout.setVisibility(View.GONE);
         }
