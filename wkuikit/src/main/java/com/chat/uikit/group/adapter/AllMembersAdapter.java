@@ -47,23 +47,10 @@ public class AllMembersAdapter extends BaseQuickAdapter<AllGroupMemberEntity, Ba
         }
         AvatarView avatarView = baseViewHolder.getView(R.id.avatarView);
         avatarView.setSize(45);
-        if (entity.getOnLine() == 1) {
-            avatarView.spotView.setVisibility(View.VISIBLE);
-            avatarView.onlineTv.setVisibility(View.GONE);
-            baseViewHolder.setGone(R.id.timeTv, true);
-        } else {
-            avatarView.spotView.setVisibility(View.GONE);
-            if (!TextUtils.isEmpty(entity.getLastOnlineTime())) {
-                avatarView.onlineTv.setVisibility(View.VISIBLE);
-                avatarView.onlineTv.setText(entity.getLastOnlineTime());
-                baseViewHolder.setGone(R.id.timeTv, true);
-            } else {
-                avatarView.onlineTv.setVisibility(View.GONE);
-                String time = String.format("%s %s", getContext().getString(R.string.last_seen_time), entity.getLastOfflineTime());
-                baseViewHolder.setText(R.id.timeTv, time);
-                baseViewHolder.setGone(R.id.timeTv, TextUtils.isEmpty(entity.getLastOfflineTime()));
-            }
-        }
+        // 去掉「查看全部群成员」的在线状态显示（绿点 / 最近在线 / 上次离线时间）
+        avatarView.spotView.setVisibility(View.GONE);
+        avatarView.onlineTv.setVisibility(View.GONE);
+        baseViewHolder.setGone(R.id.timeTv, true);
         //   baseViewHolder.setText(R.id.nameTv, showName);
         RoundTextView roleTv = baseViewHolder.getView(R.id.roleTv);
         avatarView.showAvatar(channelMember.memberUID, WKChannelType.PERSONAL, channelMember.memberAvatar);

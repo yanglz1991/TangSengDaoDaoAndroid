@@ -206,7 +206,13 @@ class GlobalActivity : WKBaseActivity<ActGlobalLayoutBinding>() {
                     }
                 }
             } else {
-                showToast(msg)
+                // 修复：服务端（如 WuKongIM usersearch 插件不可用）返回错误时，不再弹出
+                // "查询悟空IM错误" 等原始后端错误信息（对齐 iOS 静默处理）。
+                // 首页仅做容错：停止加载更多，首页展示空态。
+                wkVBinding.refreshLayout.setEnableLoadMore(false)
+                if (page == 1) {
+                    adapter.setList(ArrayList())
+                }
             }
         }
     }

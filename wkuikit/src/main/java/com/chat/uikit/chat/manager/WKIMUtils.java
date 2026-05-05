@@ -374,9 +374,50 @@ public class WKIMUtils {
                     case WKCMDKeys.wk_sync_reminders -> MsgModel.getInstance().syncReminder();
                     case WKCMDKeys.wk_sync_conversation_extra ->
                             MsgModel.getInstance().syncCoverExtra();
+                    // 头像/频道信息更新：显式处理 CMD，避免依赖 SDK 内部分发可能缺失的情况，
+                    // 确保对方/好友改头像、群头像改名时，本地头像和名字能及时刷新（对齐 iOS 行为）。
+                    case WKCMDKeys.wk_userAvatarUpdate -> {
+                        if (cmd.paramJsonObject == null) return;
+                        String uid = cmd.paramJsonObject.optString("uid");
+                        if (!TextUtils.isEmpty(uid)) {
+                            refreshChannelAvatarAndInfo(uid, WKChannelType.PERSONAL);
+                        }
+                    }
+                    case WKCMDKeys.wk_groupAvatarUpdate -> {
+                        if (cmd.paramJsonObject == null) return;
+                        String groupNo = cmd.paramJsonObject.optString("group_no");
+                        if (!TextUtils.isEmpty(groupNo)) {
+                            refreshChannelAvatarAndInfo(groupNo, WKChannelType.GROUP);
+                        }
+                    }
+                    case WKCMDKeys.wk_channelUpdate -> {
+                        if (cmd.paramJsonObject == null) return;
+                        String channelID = cmd.paramJsonObject.optString("channel_id");
+                        byte channelType = (byte) cmd.paramJsonObject.optInt("channel_type");
+                        if (!TextUtils.isEmpty(channelID)) {
+                            WKIM.getInstance().getChannelManager().fetchChannelInfo(channelID, channelType);
+                        }
+                    }
                 }
             }
         });
+    }
+
+    /**
+     * 刷新指定频道的头像缓存并主动拉取最新频道信息。
+     * 用于处理 userAvatarUpdate / groupAvatarUpdate CMD：
+     * 1) 删除本地头像文件缓存（避免 getAvatarURL 继续返回旧本地路径）；
+     * 2) 用新 UUID 更新 avatarCacheKey（让 Glide 的 MyGlideUrlWithId 命中新缓存键，重新走网络）；
+     * 3) fetchChannelInfo 触发 channelInfo 监听，使会话列表、通讯录、群设置等界面同步刷新。
+     */
+    private void refreshChannelAvatarAndInfo(String channelID, byte channelType) {
+        try {
+            String key = UUID.randomUUID().toString().replace("-", "");
+            AvatarView.clearCache(channelID, channelType);
+            WKIM.getInstance().getChannelManager().updateAvatarCacheKey(channelID, channelType, key);
+            WKIM.getInstance().getChannelManager().fetchChannelInfo(channelID, channelType);
+        } catch (Throwable ignored) {
+        }
     }
 
     public WKUIChatMsgItemEntity msg2UiMsg(IConversationContext context, WKMsg msg, int memberCount, boolean showNickName, boolean isChoose) {

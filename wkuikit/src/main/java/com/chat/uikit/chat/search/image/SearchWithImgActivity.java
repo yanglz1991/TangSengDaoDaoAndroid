@@ -232,7 +232,8 @@ public class SearchWithImgActivity extends WKBaseActivity<ActSearchMsgImgLayoutB
         GlobalSearchModel.INSTANCE.search(req, (code, s, globalSearch) -> {
             wkVBinding.refreshLayout.finishLoadMore();
             wkVBinding.refreshLayout.finishRefresh();
-            if (WKReader.isNotEmpty(globalSearch.messages)) {
+            // 修复：服务端异常或空响应时 globalSearch 为 null，避免 NPE 崩溃，并展示"暂无数据"态（对齐 iOS 行为，不弹错误提示）
+            if (globalSearch != null && WKReader.isNotEmpty(globalSearch.messages)) {
                 List<SearchImgEntity> fileEntityList = new ArrayList<>();
                 // 构造数据
                 for (GlobalMessage msg : globalSearch.messages) {
@@ -278,7 +279,8 @@ public class SearchWithImgActivity extends WKBaseActivity<ActSearchMsgImgLayoutB
                     entity.url = showUrl;
                     fileEntityList.add(entity);
                 }
-                if (WKReader.isNotEmpty(adapter.getData())) {
+                // 防御：若本页所有消息解析后均为空，避免 fileEntityList.get(0) 越界
+                if (WKReader.isNotEmpty(fileEntityList) && WKReader.isNotEmpty(adapter.getData())) {
                     SearchImgEntity entity = adapter.getData().get(adapter.getData().size() - 1);
                     if (entity.date.equals(fileEntityList.get(0).date)) {
                         fileEntityList.remove(0);
