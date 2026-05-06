@@ -10,7 +10,6 @@ import com.chat.base.endpoint.EndpointManager;
 import com.chat.base.endpoint.EndpointSID;
 import com.chat.base.endpoint.entity.ChatViewMenu;
 import com.chat.base.entity.GlobalMessage;
-import com.chat.base.msgitem.WKContentType;
 import com.chat.uikit.R;
 import com.chat.uikit.databinding.ActCommonRefreshListLayoutBinding;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
@@ -32,7 +31,6 @@ public class SearchWithMemberActivity extends WKBaseActivity<ActCommonRefreshLis
     // 本地 SDK 分页游标：从最新开始（0）逐页向后翻
     private long oldestOrderSeq = 0;
     private static final int PAGE_SIZE = 20;
-    private static final int FETCH_BATCH = 60;
 
     @Override
     protected ActCommonRefreshListLayoutBinding getViewBinding() {
@@ -97,54 +95,38 @@ public class SearchWithMemberActivity extends WKBaseActivity<ActCommonRefreshLis
     }
 
     private void getData() {
-        // 已改为基于本地 SDK 数据库分页查询，不再调用服务端 /v1/search/global，
-        // 避免 WuKongIM 搜索插件未启用时报「查询悟空IM消息错误」。
-        // 单批拉取 FETCH_BATCH 条文本/文件消息，按 fromUID 客户端过滤后填充结果列表。
+        // 基于本地 SDK 按发送者分页查询，不再依赖服务端 /v1/search/global（搜索插件可能未启用）。
+        // 直接使用 SDK 的 getWithFromUID 接口，覆盖该成员发送的所有消息类型
+        // （文本/图片/语音/视频/文件/位置/卡片/表情等），不限 contentType。
         final boolean isFirstPage = oldestOrderSeq == 0L;
-        final int[] types = new int[]{WKContentType.WK_TEXT, WKContentType.WK_FILE};
-        final List<GlobalMessage> result = new ArrayList<>();
-        long cursor = oldestOrderSeq;
-        boolean reachedEnd = false;
-        // safety bound: 最多翻 20 次，避免极端场景死循环
-        for (int safety = 0; safety < 20 && result.size() < PAGE_SIZE; safety++) {
-            List<WKMsg> batch = WKIM.getInstance().getMsgManager()
-                    .searchMsgWithChannelAndContentTypes(channelID, WKChannelType.GROUP, cursor, FETCH_BATCH, types);
-            if (batch == null || batch.isEmpty()) {
-                reachedEnd = true;
-                break;
-            }
-            for (WKMsg m : batch) {
-                if (m == null) continue;
-                cursor = m.orderSeq;
-                if (fromUID != null && fromUID.equals(m.fromUID)) {
-                    result.add(GlobalMessage.fromWKMsg(m));
-                    if (result.size() >= PAGE_SIZE) break;
-                }
-            }
-            if (batch.size() < FETCH_BATCH) {
-                reachedEnd = true;
-                break;
-            }
-        }
-        oldestOrderSeq = cursor;
+        List<WKMsg> list = WKIM.getInstance().getMsgManager()
+                .getWithFromUID(channelID, WKChannelType.GROUP, fromUID, oldestOrderSeq, PAGE_SIZE);
 
         wkVBinding.refreshLayout.finishLoadMore();
         wkVBinding.refreshLayout.finishRefresh();
-        if (result.isEmpty()) {
-            if (reachedEnd) {
-                wkVBinding.refreshLayout.setEnableLoadMore(false);
-            }
+
+        if (list == null || list.isEmpty()) {
+            wkVBinding.refreshLayout.setEnableLoadMore(false);
             if (isFirstPage) {
                 adapter.setList(new ArrayList<>());
             }
             return;
         }
+
+        List<GlobalMessage> result = new ArrayList<>(list.size());
+        for (WKMsg m : list) {
+            if (m == null) continue;
+            result.add(GlobalMessage.fromWKMsg(m));
+            // SDK 返回顺序为按 orderSeq 倒序（最新在前），用最后一条更新游标
+            oldestOrderSeq = m.orderSeq;
+        }
+
         if (isFirstPage) {
             adapter.setList(result);
         } else {
             adapter.addData(result);
         }
-        if (reachedEnd) {
+        if (list.size() < PAGE_SIZE) {
             wkVBinding.refreshLayout.setEnableLoadMore(false);
         }
     }
