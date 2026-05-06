@@ -1,0 +1,37 @@
+<resources>
+    <string name="backend_operation_protection">Backend operation protection</string>
+    <string name="backend_operation_protection_des">Adjusting system settings to reduce automatic disconnection/no push issues in background operations</string>
+    <string name="open_system_setting_tips">%s will automatically disconnect in the background, and the main reason for receiving messages without reminders is that the system cuts off the network or kills applications running in the background during sleep in order to save power or release system resources. To address the above issues, users can follow the following instructions to optimize the situation where %s automatically disconnects and new messages do not respond</string>
+    <string name="setting_items">Setting items</string>
+    <string name="tutorials">Tutorials</string>
+    <string name="neglecting_battery_optimization">Neglecting battery optimization</string>
+    <string name="neglecting_battery_optimization_desc">After battery optimization is enabled, the application\'s backend operation may be restricted, which may cause the application to be unable to connect in the backend, and there may be no notification for new messages</string>
+    <string name="keep_network_connection">Keep network connection in sleep mode</string>
+    <string name="keep_network_connection_desc">Keeping the network connection in sleep mode by default will cause the application to disconnect when the phone is in sleep mode</string>
+    <string name="self_start">Self start settings</string>
+    <string name="self_start_desc">Adding %s to the backend running protection list can keep the backend running continuously at a read level, avoiding background connection issues caused by this reason</string>
+    <string name="lock_tasks">Lock backend tasks</string>
+    <string name="lock_tasks_desc">Opening the backend task lock can prevent %s from being cleaned up by the cleaning program and avoid backend connection issues caused by this reason</string>
+    <string name="provincial_traffic_volume">Provincial traffic settings</string>
+    <string name="provincial_traffic_volume_desc">After enabling the traffic saving mode, the system will prevent the backend from using network data and reduce its frequency of using the network in the frontend, which may cause issues such as backend disconnection</string>
+    <string name="invalid_description">If the above steps still have no effect after operation, it is advisable to avoid operating large applications in the foreground while running in the background as much as possible</string>
+    <string name="power_white_list">Power consumption setting whitelist</string>
+    <string name="power_white_list_desc">The high power consumption setting in the background can to some extent affect the continuous operation of the background, which may cause background connection disconnection issues</string>
+    <string name="tutorial_detail">Tutorial details</string>
+    <string name="app_setting">Application setting</string>
+    <string name="app_setting_desc">The different settings of power-saving strategies, self start, notification permissions, and floating window permissions can to some extent affect the continuous operation of the background, leading to issues such as disconnection in the background</string>
+    <string name="oppo_common_setting">1. Go to \'System Settings\' -> \'Application Management\' -> \'Application List\' -> Search for \'%s\' -> Click to enter \'Application Settings\' and perform the following operations. \n 1) Enter \'Traffic Usage\' -> Turn on the switches for \'Mobile Data\',\'WLAN\', and \'Can Use Data in the Background\'. \n 2) Enter\'Power Consumption Management\' -> Turn on\'Allow Full Background Behavior\' and \'Allow Applications to Self Start\' "Allow application association startup" \n 3) Open "Allow floating window display" \n 4) Enter "Notification Management" and open "Allow Notification" \n The video tutorial is as follows:</string>
+    <string name="xiaomi_common_setting">1. Open and return to the desktop, long press %s -> click on \'Application Information\', and perform the following operations. \n 1) Click on \'Power saving strategy\' -> select \'No restrictions\'. \n 2) Turn on the \'Self start\' switch. \n 3) Click on \'Notification management\' -> Open \'Allow notifications\'. \n 4) Click on \'Permission management\' -> Find the \'Display floating window\' permission and allow it. \n The video tutorial is as follows</string>
+    <string name="vivo_common_setting">Return to the desktop and long press %s, click on \'Application Information\', click on \'Notification\' -> \'Allow Notification\', click on \'Permissions\' -> \'Single Permission Settings\' to open the \'Self Start\', \'Associated Start\', and \'Suspended Window\' permissions. \n The video is as follows</string>
+    <string name="power_white_list_setting">Go to "Settings" in the mobile system, then go to "Battery", then go to "High power consumption in the background", and then turn on the %s switch. \n The video tutorial is as follows</string>
+    <string name="vivo_flow_setting">Open "iButler" ->click on \'Traffic Management\' -> click on \'Traffic saving mode\' -> click on the application whitelist and turn on the %s switch</string>
+    <string name="xiaomi_lock_task_setting">Open %s -> Then slide on the desktop to open the application running interface -> Long press %s -> Click on the "Lock" button. The "Lock" symbol appears in the upper right corner of the icon, indicating successful setting of the symbol.\n The video tutorial is as follows</string>
+    <string name="other_lock_task_setting">Open %s -> Swipe up from the bottom of the screen to call up the application for control panel -> Click on the lock button in the upper right corner of the icon, and a lock icon will appear in the upper right corner, indicating successful setting of the icon. \n The video tutorial is as follows</string>
+    <string name="huawei_keep_connection">Go to System Settings -> Battery -> More Battery Settings -> Always maintain network connection when turning on sleep. \n The video tutorial is as follows</string>
+    <string name="huawei_self_start">Go to System Settings -> Applications -> Application Launch Management -> \'%s\', turn off automatic management, and manually turn on all the \'Allow Self Start\',\'Allow Associated Start\', and \'Allow Background Allow\' switches.\n The video tutorial is as follows</string>
+    <string name="hauwei_provincial_traffic_volume">Go to system settings ->search for \'smart save traffic\' -> search for \'%s\'. If the smart save traffic is turned on, please turn off the smart save traffic or open the whitelist of %s. \n The video tutorial is as follows</string>
+    <string name="floating_window">Suspended window permission settings</string>
+    <string name="floating_window_desc">Enabling the floating window permission can maintain a continuous connection in the background to a certain extent, avoiding the problem of application disconnection in the background caused by this reason</string>
+    <string name="huawei_float_window_setting">Go to System Settings -> \'Applications\' -> \'Permission Management\' -> Search for \'%s\' -> \'Suspended Window\', and set to allow \n The video tutorial is as follows</string>
+
+</resources>

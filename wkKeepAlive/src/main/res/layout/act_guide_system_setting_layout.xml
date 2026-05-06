@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/homeColor"
+    android:orientation="vertical"
+    tools:ignore="MissingDefaultResource">
+
+    <include layout="@layout/wk_title_bar_layout" />
+
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/homeColor"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/openSystemSettingTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="15dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="@string/open_system_setting_tips"
+                    android:textColor="@color/popupTextColor"
+                    android:textSize="@dimen/font_size_14" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@color/screen_bg"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/setting_items"
+                        android:textColor="@color/color999"
+                        android:textSize="@dimen/font_size_14" />
+
+                    <LinearLayout
+                        android:id="@+id/neglectingBatteryOptimizationLayout"
+                        style="@style/layoutBg">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/neglecting_battery_optimization"
+                                android:textColor="@color/colorDark"
+                                android:textSize="@dimen/font_size_16"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/neglecting_battery_optimization_desc"
+                                android:textColor="@color/color999"
+                                android:textSize="@dimen/font_size_14" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/gotoSettingTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/btn_frame_account"
+                            android:gravity="center"
+                            android:minWidth="70dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ps_go_setting"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/font_size_14" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/settingLayout"
+                        style="@style/layoutBg">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/app_setting"
+                                android:textColor="@color/colorDark"
+                                android:textSize="@dimen/font_size_16"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/app_setting_desc"
+                                android:textColor="@color/color999"
+                                android:textSize="@dimen/font_size_14" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/appSettingTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/btn_frame_account"
+                            android:gravity="center"
+                            android:minWidth="70dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/tutorials"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/font_size_14" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/powerLayout"
+                        style="@style/layoutBg"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/power_white_list"
+                                android:textColor="@color/colorDark"
+                                android:textSize="@dimen/font_size_16"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/power_white_list_desc"
+                                android:textColor="@color/color999"
+                                android:textSize="@dimen/font_size_14" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/powerWhiteTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/btn_frame_account"
+                            android:gravity="center"
+                            android:minWidth="70dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/tutorials"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/font_size_14" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/keepNetWorkConnectionLayout"
+                        style="@style/layoutBg"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/keep_network_connection"
+                                android:textColor="@color/colorDark"
+                                android:textSize="@dimen/font_size_16"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/keep_network_connection_desc"
+                                android:textColor="@color/color999"
+                                android:textSize="@dimen/font_size_14" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/keepConnectionTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/btn_frame_account"
+                            android:gravity="center"
+                            android:minWidth="70dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/tutorials"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/font_size_14" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/selfStartLayout"
+                        style="@style/layoutBg">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/self_start"
+                                android:textColor="@color/colorDark"
+                                android:textSize="@dimen/font_size_16"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/selfStartDescTv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/self_start_desc"
+                                android:textColor="@color/color999"
+                                android:textSize="@dimen/font_size_14" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/selfStartTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/btn_frame_account"
+                            android:gravity="center"
+                            android:minWidth="70dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/tutorials"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/font_size_14" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/floatWindowLayout"
+                        style="@style/layoutBg"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/floating_window"
+                                android:textColor="@color/colorDark"
+                                android:textSize="@dimen/font_size_16"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/floating_window_desc"
+                                android:textColor="@color/color999"
+                                android:textSize="@dimen/font_size_14" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/floatWindowTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/btn_frame_account"
+                            android:gravity="center"
+                            android:minWidth="70dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/tutorials"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/font_size_14" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/layoutBg">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/lock_tasks"
+                                android:textColor="@color/colorDark"
+                                android:textSize="@dimen/font_size_16"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/lockTaskDescTv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/lock_tasks_desc"
+                                android:textColor="@color/color999"
+                                android:textSize="@dimen/font_size_14" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/lockTaskTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/btn_frame_account"
+                            android:gravity="center"
+                            android:minWidth="70dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/tutorials"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/font_size_14" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/provincialTrafficVolumeLayout"
+                        style="@style/layoutBg">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/provincial_traffic_volume"
+                                android:textColor="@color/colorDark"
+                                android:textSize="@dimen/font_size_16"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/provincial_traffic_volume_desc"
+                                android:textColor="@color/color999"
+                                android:textSize="@dimen/font_size_14" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/provincialTrafficTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:background="@drawable/btn_frame_account"
+                            android:gravity="center"
+                            android:minWidth="70dp"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/tutorials"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/font_size_14" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="15dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="@string/invalid_description"
+                    android:textColor="@color/popupTextColor"
+                    android:textSize="@dimen/font_size_14" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
+</LinearLayout>

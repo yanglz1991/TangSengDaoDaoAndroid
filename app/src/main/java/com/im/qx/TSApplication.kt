@@ -22,7 +22,9 @@ import com.chat.base.config.WKApiConfig
 import com.chat.base.config.WKConfig
 import com.chat.base.config.WKConstants
 import com.chat.base.config.WKSharedPreferencesUtil
+import com.chat.base.endpoint.EndpointCategory
 import com.chat.base.endpoint.EndpointManager
+import com.chat.base.endpoint.entity.LoginMenu
 import com.chat.base.ui.Theme
 import com.chat.base.utils.ActManagerUtils
 import com.chat.base.utils.WKPlaySound
@@ -38,6 +40,7 @@ import com.chat.uikit.user.service.UserModel
 import com.chat.groupmanage.WKGroupManageApplication
 import com.chat.video.WKVideoApplication
 import com.chat.file.WKFileApplication
+import com.chat.keepalive.WKKeepAliveApplication
 import com.im.qx.R
 import kotlin.system.exitProcess
 
@@ -110,9 +113,14 @@ class TSApplication : MultiDexApplication() {
         WKGroupManageApplication.getInstance().init();//群管模块
         WKVideoApplication.getInstance().init(this);//视频模块
         WKFileApplication.getInstance().init(this);//文件模块
+        WKKeepAliveApplication.instance.init();//后台运行保护引导模块（注册 show_keep_alive_item endpoint）
 
         addAppFrontBack()
         addListener()
+        // 若已登录，立即启动 IM 长连接保活服务（冷启动恢复登录态时生效）
+        if (!TextUtils.isEmpty(WKConfig.getInstance().token)) {
+            KeepAliveService.start(this)
+        }
     }
 
     private fun initApi() {
@@ -145,39 +153,40 @@ class TSApplication : MultiDexApplication() {
         helper.register(this, object : AppFrontBackHelper.OnAppStatusListener {
             override fun onFront() {
                 if (!TextUtils.isEmpty(WKConfig.getInstance().token)) {
-                    if (WKBaseApplication.getInstance().disconnect) {
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            EndpointManager.getInstance()
-                                .invoke("chow_check_lock_screen_pwd", null)
-                        }, 1000)
-                    }
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        EndpointManager.getInstance()
+                            .invoke("chow_check_lock_screen_pwd", null)
+                    }, 1000)
+                    // initIMListener 内部按 key="system" 覆盖注册，重复调用安全
                     WKIMUtils.getInstance().initIMListener()
                     WKUIKitApplication.getInstance().startChat()
                     UserModel.getInstance().getOnlineUsers()
-
+                    // 已登录状态下确保保活服务处于运行（幂等）
+                    KeepAliveService.start(this@TSApplication)
                 }
             }
 
             override fun onBack() {
-                val result = EndpointManager.getInstance().invoke("rtc_is_calling", null)
-                var isCalling = false
-                if (result != null) {
-                    isCalling = result as Boolean
-                }
-                if (WKBaseApplication.getInstance().disconnect && !isCalling) {
-                    WKUIKitApplication.getInstance().stopConn()
-                }
-                WKIMUtils.getInstance().removeListener()
+                // 未配置厂商推送（FCM/小米/华为/OPPO/vivo）时，后台消息只能依赖长连接，
+                // 因此这里不再主动断开 IM，也不再移除新消息监听器，否则 showNotification
+                // 在后台永远不会被触发，用户将收不到任何新消息提示。
                 WKSharedPreferencesUtil.getInstance()
                     .putLong("lock_start_time", WKTimeUtils.getInstance().currentSeconds)
-
             }
         })
     }
 
     private fun addListener() {
         createNotificationChannel()
+        // 登录成功后启动 IM 长连接保活服务
+        EndpointManager.getInstance().setMethod(
+            "ts_keep_alive_on_login",
+            EndpointCategory.loginMenus
+        ) { LoginMenu { KeepAliveService.start(this@TSApplication) } }
+
         EndpointManager.getInstance().setMethod("main_show_home_view") { `object` ->
+            // exitLogin() 会调用 main_show_home_view 跳回登录页，在此统一停止保活服务
+            KeepAliveService.stop(this@TSApplication)
             if (`object` != null) {
                 val from = `object` as Int
                 val intent = Intent(applicationContext, MainActivity::class.java)

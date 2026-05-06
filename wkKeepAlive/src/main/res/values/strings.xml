@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="backend_operation_protection">后台运行保护</string>
+    <string name="backend_operation_protection_des">调整系统设置减少后台运行自动断开/无推送问题</string>
+    <string name="open_system_setting_tips">%s 在后台会自动断开，收到消息无提醒的原因主要是系统为了省电或释放系统资源，在休眠时给后台应用断网或杀死后台运行的应用。针对上述问题，用户可以按照下面指导来优化 %s 自动断开，新消息无响应的情况</string>
+    <string name="setting_items">设置项</string>
+    <string name="tutorials">看教程</string>
+    <string name="neglecting_battery_optimization">忽略电池优化</string>
+    <string name="neglecting_battery_optimization_desc">电池优化开启后，应用后台运行可能受到限制，可能导致应用在后台无法连接，新消息无通知等问题</string>
+    <string name="keep_network_connection">休眠状态保持网络连接</string>
+    <string name="keep_network_connection_desc">休眠状态保持网络连接默认时关闭状态，这会导致应用在手机休眠时断开连接</string>
+    <string name="self_start">自启动设置</string>
+    <string name="self_start_desc">将%s加入后台运行保护名单，可以在已读程度上保持后台持续运行，避免此原因导致后台连接问题</string>
+    <string name="lock_tasks">后台任务加锁</string>
+    <string name="lock_tasks_desc">打开后台任务加锁，可以避免 %s 被清理程序清理，避免该原因导致的后台连接问题</string>
+    <string name="provincial_traffic_volume">省流量设置</string>
+    <string name="provincial_traffic_volume_desc">省流量模式开启后，系统将阻止后台使用网络数据，并降低其在前台使用网络的频率，可能导致后台断开连接等问题</string>
+    <string name="invalid_description">如果上述步骤操作后仍没效果，可以在使用上尽量避免后台运行时在前台操作大型应用</string>
+    <string name="power_white_list">后台高耗电设置白名单</string>
+    <string name="power_white_list_desc">后台高耗电设置可以在一定程度上影响后台持续运行，可能导致后台连接断开问题</string>
+    <string name="tutorial_detail">教程详情</string>
+    <string name="app_setting">应用设置</string>
+    <string name="app_setting_desc">省电策略/自启动/通知权限/悬浮窗权限的不同设置，可以在一定程度上影响后台持续运行，导致后台断开连接等问题</string>
+    <string name="oppo_common_setting">1.进入‘系统设置’ -> ‘应用管理’ -> ‘应用列表’ -> 搜索‘%s’ -> 点击进入‘应用设置’，进行以下操作\n 1) 进入‘流量使用情况’ -> 打开‘移动数据’、‘WLAN’和‘可后台使用数据’的开关\n 2) 进入‘耗电管理’ -> 打开‘允许完全后台行为’、‘允许应用自启动’、‘允许应用关联启动’\n 3) 打开‘允许显示悬浮窗’\n 4）进入‘通知管理’，打开‘允许通知’\n 视频教程如下：</string>
+    <string name="xiaomi_common_setting">1.打开回到桌面长按 %s -> 点击‘应用信息’，进行以下操作\n 1) 点击‘省电策略’ -> 选择‘无限制’\n 2）打开‘自启动’开关\n 3）点击‘通知管理’ -> 打开‘允许通知’\n 4）点击‘权限管理’ -> 找到‘显示悬浮窗’权限并允许\n 视频教程如下</string>
+    <string name="vivo_common_setting">回到桌面长按 %s 点击‘应用信息’，点击‘通知’ -> ‘允许通知’，点击‘权限’ -> ‘单项权限设置’ 将 ‘自启动’，‘关联启动’，‘悬浮窗’权限打开。\n视频如下</string>
+    <string name="power_white_list_setting">进入手机系统的‘设置’ -> 进入 ‘电池’ -> 进入‘后台高耗电’ -> 将 %s 的开关打开。\n视频教程如下</string>
+    <string name="vivo_flow_setting">打开‘i管家’ -> 点击 ‘流量管理’ -> 点击‘省流量模式’ -> 点击应用白名单，将%s开关打开</string>
+    <string name="xiaomi_lock_task_setting">打开 %s -> 然后在桌面上滑打开应用运行界面 -> 长按 %s -> 点击‘锁’按钮，图标右上角出现“锁”的标识，标识设置成功。\n 视频教程如下</string>
+    <string name="other_lock_task_setting">打开 %s -> 从屏幕底部向上滑动唤出应用进行控制面板 -> 点击右上角锁定按钮，图标右上角出现锁的标识，标识设置成功。\n 视频教程如下</string>
+    <string name="huawei_keep_connection">进入系统设置 -> 电池 -> 更多电池设置 -> 打开休眠时始终保持网络连接。\n 视频教程如下</string>
+    <string name="huawei_self_start">进入系统设置 -> ‘应用’ -> ‘应用启动管理’ -> ‘%s’，关闭自动管理，并手动将 ‘允许自启动’+‘允许关联启动’+‘允许后台允许’开关全部打开 \n 视频教程如下</string>
+    <string name="hauwei_provincial_traffic_volume">进入系统设置 -> 搜索 ‘智能省流量’ -> 搜索‘%s’，如果智能省流量打开状态，请关闭智能省流量或者打开%s的白名单。\n 视频教程如下</string>
+    <string name="floating_window">悬浮窗权限设置</string>
+    <string name="floating_window_desc">开启悬浮窗权限可以在一定程度上保持后台持续连接，避免此原因导致应用在后台断开连接问题</string>
+    <string name="huawei_float_window_setting">进入系统设置 -> ‘应用’ -> ‘权限管理’ -> 搜索‘%s’ -> ‘悬浮窗’，设置允许\n 视频教程如下</string>
+</resources>

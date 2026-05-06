@@ -16,10 +16,6 @@ import com.chat.base.endpoint.EndpointSID
 import com.chat.base.endpoint.entity.ChatViewMenu
 import com.chat.base.endpoint.entity.SearchChatContentMenu
 import com.chat.base.entity.GlobalMessage
-import com.chat.base.entity.GlobalSearchReq
-import com.chat.base.msgitem.WKContentType
-import com.chat.base.net.HttpResponseCode
-import com.chat.base.search.GlobalSearchModel
 import com.chat.base.ui.Theme
 import com.chat.base.utils.SoftKeyboardUtils
 import com.chat.base.utils.WKReader
@@ -151,32 +147,25 @@ class MessageRecordActivity : WKBaseActivity<ActMessageRecordLayoutBinding>() {
     }
 
     fun searchMessage() {
-        val contentType = ArrayList<Int>()
-        contentType.add(WKContentType.WK_TEXT)
-        contentType.add(WKContentType.WK_FILE)
-        val req =
-            GlobalSearchReq(1, keyword, channelID, channelType, "", "", contentType, page, 20, 0, 0)
-
-        GlobalSearchModel.search(req) { code, msg, resp ->
-            wkVBinding.refreshLayout.finishRefresh()
-            wkVBinding.refreshLayout.finishLoadMore()
-            if (code != HttpResponseCode.success) {
-                showToast(msg)
-                return@search
-            }
-            if (resp == null || WKReader.isEmpty(resp.messages)) {
-                wkVBinding.refreshLayout.setEnableLoadMore(false)
-                if (page == 1) {
-                    wkVBinding.noDataTv.visibility = View.VISIBLE
-                }
-                return@search
-            }
-            wkVBinding.noDataTv.visibility = View.GONE
-            if (page == 1) {
-                messageAdapter.setList(resp.messages)
-            } else {
-                messageAdapter.addData(resp.messages)
-            }
+        // 已改为基于本地 SDK 数据库搜索，不再调用服务端 /v1/search/global，
+        // 避免 WuKongIM 搜索插件未启用时报「查询悟空IM消息错误」。
+        wkVBinding.refreshLayout.finishRefresh()
+        wkVBinding.refreshLayout.finishLoadMore()
+        wkVBinding.refreshLayout.setEnableLoadMore(false)
+        val list = WKIM.getInstance().msgManager.searchWithChannel(
+            keyword, channelID, channelType
+        )
+        if (WKReader.isEmpty(list)) {
+            messageAdapter.setList(ArrayList())
+            wkVBinding.noDataTv.visibility = View.VISIBLE
+            return
         }
+        wkVBinding.noDataTv.visibility = View.GONE
+        val mapped = ArrayList<GlobalMessage>(list.size)
+        for (m in list) {
+            if (m == null) continue
+            mapped.add(GlobalMessage.fromWKMsg(m))
+        }
+        messageAdapter.setList(mapped)
     }
 }

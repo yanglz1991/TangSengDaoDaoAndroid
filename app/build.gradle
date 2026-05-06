@@ -126,8 +126,7 @@ dependencies {
     implementation project(path: ':wkfile')//文件模块
     implementation project(path: ':wkgroupmanage')//群管模块
     implementation project(path: ':wkvideo')//视频模块
-    
-    // implementation project(path: ':wkKeepAlive')//保活
+    implementation project(path: ':wkKeepAlive')//后台运行保护引导模块
     // implementation project(path: ':wkmoments')//朋友圈
     // implementation project(path: ':wkfavorite')//收藏
     // implementation project(path: ':wkrtc')//音视频模块

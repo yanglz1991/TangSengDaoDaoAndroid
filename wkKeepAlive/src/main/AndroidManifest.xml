@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 忽略电池优化-->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <application>
+        <activity android:name="com.chat.keepalive.ui.GuideSystemSettingActivity" />
+        <activity android:name="com.chat.keepalive.ui.SettingDetailActivity" />
+    </application>
+</manifest>

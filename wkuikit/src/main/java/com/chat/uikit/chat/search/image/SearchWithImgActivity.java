@@ -17,11 +17,8 @@ import com.chat.base.endpoint.entity.ChatChooseContacts;
 import com.chat.base.endpoint.entity.ChatViewMenu;
 import com.chat.base.endpoint.entity.ChooseChatMenu;
 import com.chat.base.entity.GlobalMessage;
-import com.chat.base.entity.GlobalSearchReq;
 import com.chat.base.entity.ImagePopupBottomSheetItem;
 import com.chat.base.msgitem.WKContentType;
-import com.chat.base.search.GlobalSearchModel;
-import com.chat.base.ui.Theme;
 import com.chat.base.utils.AndroidUtilities;
 import com.chat.base.utils.WKDialogUtils;
 import com.chat.base.utils.WKReader;
@@ -54,7 +51,9 @@ public class SearchWithImgActivity extends WKBaseActivity<ActSearchMsgImgLayoutB
     private String channelID;
     private byte channelType;
     private SearchWithImgAdapter adapter;
-    private int page = 1;
+    // 本地 SDK 分页游标：从最新开始（0）逐页向后翻
+    private long oldestOrderSeq = 0;
+    private static final int PAGE_SIZE = 20;
 
     @Override
     protected ActSearchMsgImgLayoutBinding getViewBinding() {
@@ -101,8 +100,6 @@ public class SearchWithImgActivity extends WKBaseActivity<ActSearchMsgImgLayoutB
         wkVBinding.refreshLayout.setOnRefreshLoadMoreListener(new OnRefreshLoadMoreListener() {
             @Override
             public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
-                //  oldestOrderSeq = adapter.getData().get(adapter.getData().size() - 1).oldestOrderSeq;
-                page++;
                 getData();
             }
 
@@ -226,75 +223,89 @@ public class SearchWithImgActivity extends WKBaseActivity<ActSearchMsgImgLayoutB
     }
 
     private void getData() {
-        ArrayList<Integer> contentType = new ArrayList<>();
-        contentType.add(WKContentType.WK_IMAGE);
-        GlobalSearchReq req = new GlobalSearchReq(1, "", channelID, channelType, "", "", contentType, page, 20, 0, 0);
-        GlobalSearchModel.INSTANCE.search(req, (code, s, globalSearch) -> {
-            wkVBinding.refreshLayout.finishLoadMore();
-            wkVBinding.refreshLayout.finishRefresh();
-            // 修复：服务端异常或空响应时 globalSearch 为 null，避免 NPE 崩溃，并展示"暂无数据"态（对齐 iOS 行为，不弹错误提示）
-            if (globalSearch != null && WKReader.isNotEmpty(globalSearch.messages)) {
-                List<SearchImgEntity> fileEntityList = new ArrayList<>();
-                // 构造数据
-                for (GlobalMessage msg : globalSearch.messages) {
-                    WKMessageContent content = msg.getMessageModel();
-                    if (content == null) {
-                        continue;
-                    }
-                    WKImageContent msgModel = null;
-                    if (content instanceof WKImageContent) {
-                        msgModel = (WKImageContent) content;
-                    }
-                    if (msgModel == null) {
-                        continue;
-                    }
-                    String date = WKTimeUtils.getInstance().time2YearMonth(msg.getTimestamp() * 1000);
-                    if (WKReader.isNotEmpty(fileEntityList)) {
-                        if (!fileEntityList.get(fileEntityList.size() - 1).date.equals(date)) {
-                            SearchImgEntity entity = new SearchImgEntity();
-                            entity.date = date;
-                            entity.itemType = 1;
-                            fileEntityList.add(entity);
-                        }
-                    } else {
-                        SearchImgEntity entity = new SearchImgEntity();
-                        entity.date = date;
-                        entity.itemType = 1;
-                        fileEntityList.add(entity);
-                    }
-                    SearchImgEntity entity = new SearchImgEntity();
-                    entity.date = date;
-                    entity.message = msg;
+        // 已改为基于本地 SDK 数据库分页查询，不再调用服务端 /v1/search/global，
+        // 避免 WuKongIM 搜索插件未启用时「图片」分类显示「暂无数据」。
+        final boolean isFirstPage = oldestOrderSeq == 0L;
+        final int[] types = new int[]{WKContentType.WK_IMAGE};
+        List<WKMsg> list = WKIM.getInstance().getMsgManager()
+                .searchMsgWithChannelAndContentTypes(channelID, channelType, oldestOrderSeq, PAGE_SIZE, types);
 
-                    String showUrl = "";
-                    if (!TextUtils.isEmpty(msgModel.localPath)) {
-                        File file = new File(msgModel.localPath);
-                        if (file.exists()) {
-                            showUrl = msgModel.localPath;
-                        }
-                    }
-                    if (TextUtils.isEmpty(showUrl)) {
-                        showUrl = WKApiConfig.getShowUrl(msgModel.url);
-                    }
-                    entity.url = showUrl;
-                    fileEntityList.add(entity);
+        wkVBinding.refreshLayout.finishLoadMore();
+        wkVBinding.refreshLayout.finishRefresh();
+
+        if (list == null || list.isEmpty()) {
+            wkVBinding.refreshLayout.finishLoadMoreWithNoMoreData();
+            if (isFirstPage) {
+                wkVBinding.refreshLayout.setEnableLoadMore(false);
+                wkVBinding.nodataTv.setVisibility(View.VISIBLE);
+            }
+            return;
+        }
+
+        List<SearchImgEntity> fileEntityList = new ArrayList<>();
+        long cursor = oldestOrderSeq;
+        for (WKMsg msg : list) {
+            if (msg == null) continue;
+            cursor = msg.orderSeq;
+            WKMessageContent content = msg.baseContentMsgModel;
+            if (!(content instanceof WKImageContent)) {
+                continue;
+            }
+            WKImageContent msgModel = (WKImageContent) content;
+            String date = WKTimeUtils.getInstance().time2YearMonth(msg.timestamp * 1000L);
+            if (WKReader.isNotEmpty(fileEntityList)) {
+                if (!fileEntityList.get(fileEntityList.size() - 1).date.equals(date)) {
+                    SearchImgEntity dateEntity = new SearchImgEntity();
+                    dateEntity.date = date;
+                    dateEntity.itemType = 1;
+                    fileEntityList.add(dateEntity);
                 }
-                // 防御：若本页所有消息解析后均为空，避免 fileEntityList.get(0) 越界
-                if (WKReader.isNotEmpty(fileEntityList) && WKReader.isNotEmpty(adapter.getData())) {
-                    SearchImgEntity entity = adapter.getData().get(adapter.getData().size() - 1);
-                    if (entity.date.equals(fileEntityList.get(0).date)) {
-                        fileEntityList.remove(0);
-                    }
-                }
-                adapter.addData(fileEntityList);
             } else {
-                wkVBinding.refreshLayout.finishLoadMoreWithNoMoreData();
-                if (page == 1) {
-                    wkVBinding.refreshLayout.setEnableLoadMore(false);
-                    wkVBinding.nodataTv.setVisibility(View.VISIBLE);
+                SearchImgEntity dateEntity = new SearchImgEntity();
+                dateEntity.date = date;
+                dateEntity.itemType = 1;
+                fileEntityList.add(dateEntity);
+            }
+            SearchImgEntity entity = new SearchImgEntity();
+            entity.date = date;
+            entity.message = GlobalMessage.fromWKMsg(msg);
+
+            String showUrl = "";
+            if (!TextUtils.isEmpty(msgModel.localPath)) {
+                File file = new File(msgModel.localPath);
+                if (file.exists()) {
+                    showUrl = msgModel.localPath;
                 }
             }
-            return null;
-        });
+            if (TextUtils.isEmpty(showUrl)) {
+                showUrl = WKApiConfig.getShowUrl(msgModel.url);
+            }
+            entity.url = showUrl;
+            fileEntityList.add(entity);
+        }
+        oldestOrderSeq = cursor;
+
+        // 与上一页末尾日期合并，避免重复显示日期分组
+        if (WKReader.isNotEmpty(fileEntityList) && WKReader.isNotEmpty(adapter.getData())) {
+            SearchImgEntity last = adapter.getData().get(adapter.getData().size() - 1);
+            if (last != null && last.date != null && last.date.equals(fileEntityList.get(0).date)) {
+                fileEntityList.remove(0);
+            }
+        }
+
+        if (isFirstPage) {
+            adapter.setList(fileEntityList);
+            if (fileEntityList.isEmpty()) {
+                wkVBinding.nodataTv.setVisibility(View.VISIBLE);
+            } else {
+                wkVBinding.nodataTv.setVisibility(View.GONE);
+            }
+        } else {
+            adapter.addData(fileEntityList);
+        }
+
+        if (list.size() < PAGE_SIZE) {
+            wkVBinding.refreshLayout.finishLoadMoreWithNoMoreData();
+        }
     }
 }

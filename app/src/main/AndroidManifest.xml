@@ -45,6 +45,9 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <!--    Android 14（API 34）精选访问权限：声明后系统会显示「全部 / 仅选择 / 不允许」三选一，
+            未声明时部分 OEM（Honor MagicOS 8.0 等）会强制按精选模式处理，导致相册查询为空。-->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
     <!--    Android 13版本适配，通知权限-->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -52,6 +55,10 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Android 14（API 34）起，每种 foregroundServiceType 需要申请对应权限。
+         IM 长连接保活归类为 dataSync（后台数据同步）。 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
@@ -107,8 +114,6 @@
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_logo"
         android:label="@string/app_name"
-        android:preserveLegacyExternalStorage="true"
-        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_logo_round"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
@@ -136,6 +141,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- IM 长连接保活前台服务：在未配置厂商推送时，后台接收消息依赖此服务保活。 -->
+        <service
+            android:name="com.im.qx.KeepAliveService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>

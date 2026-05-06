@@ -31,3 +31,4 @@ include ':wkpush'
 include ':wkfile'//文件模块
 include ':wkgroupmanage'//群管模块
 include ':wkvideo'//视频模块
+include ':wkKeepAlive'//后台运行保护引导模块
