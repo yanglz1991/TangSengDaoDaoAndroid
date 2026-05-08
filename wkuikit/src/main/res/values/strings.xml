@@ -47,6 +47,9 @@
     <string name="my_remark_name_in_group">我在本群的昵称</string>
     <string name="chat_info">聊天信息</string>
     <string name="choose_chat">选择会话</string>
+    <string name="recent_chats">最近聊天</string>
+    <string name="groups">群组</string>
+    <string name="friends">好友</string>
     <string name="apply">申请加好友</string>
     <string name="applyed">已申请</string>
     <string name="hint_search">搜索(精确搜索)</string>

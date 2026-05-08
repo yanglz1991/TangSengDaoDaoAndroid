@@ -46,6 +46,9 @@
     <string name="my_remark_name_in_group">My Alias in Group</string>
     <string name="chat_info">Chat Info</string>
     <string name="choose_chat">Select</string>
+    <string name="recent_chats">Recent</string>
+    <string name="groups">Groups</string>
+    <string name="friends">Friends</string>
     <string name="apply">Add</string>
     <string name="applyed">Applied</string>
     <string name="hint_search">Search(Precise search)</string>

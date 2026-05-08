@@ -52,8 +52,101 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Tab 栏:最近聊天/群组/好友 -->
+    <LinearLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/homeColor"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/tabRecentLayout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tabRecentTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/recent_chats"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <View
+                android:id="@+id/tabRecentIndicator"
+                android:layout_width="20dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="6dp"
+                android:background="@color/colorAccent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tabGroupLayout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tabGroupTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/groups"
+                android:textColor="@color/color999"
+                android:textSize="14sp" />
+
+            <View
+                android:id="@+id/tabGroupIndicator"
+                android:layout_width="20dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="6dp"
+                android:background="@color/transparent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tabFriendLayout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tabFriendTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/friends"
+                android:textColor="@color/color999"
+                android:textSize="14sp" />
+
+            <View
+                android:id="@+id/tabFriendIndicator"
+                android:layout_width="20dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="6dp"
+                android:background="@color/transparent" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/line_view_bg" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 </LinearLayout>
