@@ -85,6 +85,19 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/secureChannelLayout"
+                        style="@style/layoutBg"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/secureChannelTv"
+                            style="@style/leftTextView"
+                            android:layout_weight="1" />
+
+                        <androidx.appcompat.widget.AppCompatImageView style="@style/arrow_right_iv" />
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:id="@+id/chatBgLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

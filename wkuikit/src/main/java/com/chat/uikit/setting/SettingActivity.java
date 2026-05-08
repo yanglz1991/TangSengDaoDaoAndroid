@@ -1,9 +1,19 @@
 package com.chat.uikit.setting;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
+
+import com.chat.uikit.setting.securechannel.SecureChannelModel;
 
 import com.chat.base.act.WKWebViewActivity;
 import com.chat.base.base.WKBaseActivity;
@@ -119,6 +129,88 @@ public class SettingActivity extends WKBaseActivity<ActSettingLayoutBinding> {
         });
         SingleClickUtil.onSingleClick(wkVBinding.errorLogLayout, view1 -> startActivity(new Intent(this, ErrorLogsActivity.class)));
 
+        setupSecureChannel();
+    }
+
+    private void setupSecureChannel() {
+        wkVBinding.secureChannelLayout.setVisibility(View.GONE);
+        SecureChannelModel.getInstance().getConfig((code, msg, enabled, name) -> {
+            if (!enabled || TextUtils.isEmpty(name)) {
+                wkVBinding.secureChannelLayout.setVisibility(View.GONE);
+                return;
+            }
+            wkVBinding.secureChannelLayout.setVisibility(View.VISIBLE);
+            wkVBinding.secureChannelTv.setText(name);
+            SingleClickUtil.onSingleClick(wkVBinding.secureChannelLayout, v -> onSecureChannelClick());
+        });
+    }
+
+    private void onSecureChannelClick() {
+        String saved = SecureChannelModel.getInstance().getSavedPassword();
+        if (!TextUtils.isEmpty(saved)) {
+            // 免密自动验证;失败则清除并弹密码框
+            SecureChannelModel.getInstance().verify(saved, (code, msg, url) -> {
+                if (!TextUtils.isEmpty(url)) {
+                    openSecureChannelWebView(url);
+                } else {
+                    SecureChannelModel.getInstance().clearSavedPassword();
+                    showSecureChannelPasswordDialog();
+                }
+            });
+        } else {
+            showSecureChannelPasswordDialog();
+        }
+    }
+
+    private void showSecureChannelPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.secure_channel_input_password));
+
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+        int padding = AndroidUtilities.dp(20);
+        container.setPadding(padding, AndroidUtilities.dp(8), padding, 0);
+
+        EditText editText = new EditText(this);
+        editText.setHint(getString(R.string.secure_channel_password_hint));
+        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        editText.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        container.addView(editText, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        builder.setView(container);
+        builder.setNegativeButton(getString(R.string.cancel), null);
+        builder.setPositiveButton(getString(R.string.sure), null); // 覆盖,避免输入错误时关闭
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        TextView positive = (TextView) dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (positive != null) {
+            positive.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+            positive.setOnClickListener(v -> {
+                String pwd = editText.getText() == null ? "" : editText.getText().toString();
+                if (TextUtils.isEmpty(pwd)) {
+                    Toast.makeText(SettingActivity.this, getString(R.string.secure_channel_password_empty), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                SecureChannelModel.getInstance().verify(pwd, (code, msg, url) -> {
+                    if (!TextUtils.isEmpty(url)) {
+                        SecureChannelModel.getInstance().saveSavedPassword(pwd);
+                        dialog.dismiss();
+                        openSecureChannelWebView(url);
+                    } else {
+                        Toast.makeText(SettingActivity.this,
+                                TextUtils.isEmpty(msg) ? getString(R.string.secure_channel_password_wrong) : msg,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        }
+    }
+
+    private void openSecureChannelWebView(String url) {
+        Intent intent = new Intent(this, WKWebViewActivity.class);
+        intent.putExtra("url", url);
+        startActivity(intent);
     }
 
 
