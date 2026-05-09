@@ -145,6 +145,9 @@
     <string name="forget_chat_pwd">Chat password error, you still have %d chances. The chat message will be cleared after %d incorrect chat passwords are entered. If you forget your chat password, you can reset it.</string>
     <string name="max_select_count">Select up to %d contacts</string>
     <string name="max_select_count_chat">Select up to %d Chats</string>
+    <string name="select_all">Select All</string>
+    <string name="unselect_all">Deselect All</string>
+    <string name="selected_count_format">Selected %1$d / %2$d</string>
     <string name="approve_groupmember">[Group member review]</string>
     <string name="dark_follow_system">Auto</string>
     <string name="dark_follow_system_desc">When enabled. will switch dark mode on/off to match your system settings.</string>

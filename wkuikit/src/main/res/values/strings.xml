@@ -146,6 +146,9 @@
     <string name="forget_chat_pwd">聊天密码错误，您还有%d次机会。\n%d次输错聊天密码后将清空该聊天消息。如果您忘记聊天密码可以重置聊天密码。</string>
     <string name="max_select_count">最多选择%d位联系人</string>
     <string name="max_select_count_chat">最多选择%d个会话</string>
+    <string name="select_all">全选</string>
+    <string name="unselect_all">取消全选</string>
+    <string name="selected_count_format">已选 %1$d / %2$d</string>
     <string name="approve_groupmember">[群成员审核]</string>
     <string name="dark_follow_system">跟随系统</string>
     <string name="dark_follow_system_desc">开启后，将跟随系统打开或关闭深色模式</string>

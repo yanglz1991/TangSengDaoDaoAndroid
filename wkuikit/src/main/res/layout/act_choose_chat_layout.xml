@@ -145,6 +145,47 @@
         android:layout_height="1px"
         android:background="@color/line_view_bg" />
 
+    <!-- 全选 / 取消全选 工具行（按当前 Tab 可见列表生效） -->
+    <LinearLayout
+        android:id="@+id/selectAllLayout"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="@color/homeColor"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/selectAllTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="36dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="@string/select_all"
+            android:textColor="@color/colorAccent"
+            android:textSize="13sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/selectAllCountTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color999"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/line_view_bg" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

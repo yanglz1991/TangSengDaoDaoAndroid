@@ -50,7 +50,7 @@ public class ChooseChatActivity extends WKBaseActivity<ActChooseChatLayoutBindin
     private static final int TAB_RECENT = 0;
     private static final int TAB_GROUP = 1;
     private static final int TAB_FRIEND = 2;
-    private static final int MAX_SELECT_COUNT = 9;
+    // 转发选择会话不再限制上限
 
     ChooseChatAdapter chooseChatAdapter;
     Button rightBtn;
@@ -146,16 +146,15 @@ public class ChooseChatActivity extends WKBaseActivity<ActChooseChatLayoutBindin
                 selectedChannels.remove(key);
                 chooseChatEntity.isCheck = false;
             } else {
-                if (selectedChannels.size() >= MAX_SELECT_COUNT) {
-                    showSingleBtnDialog(String.format(getString(R.string.max_select_count_chat), MAX_SELECT_COUNT));
-                    return;
-                }
                 selectedChannels.put(key, channel);
                 chooseChatEntity.isCheck = true;
             }
             adapter.notifyItemChanged(position + adapter.getHeaderLayoutCount(), chooseChatEntity);
             updateConfirmBtn();
+            updateSelectAllBar();
         });
+
+        wkVBinding.selectAllTv.setOnClickListener(v -> toggleSelectAllCurrentTab());
 
         wkVBinding.tabRecentLayout.setOnClickListener(v -> switchTab(TAB_RECENT));
         wkVBinding.tabGroupLayout.setOnClickListener(v -> switchTab(TAB_GROUP));
@@ -190,6 +189,85 @@ public class ChooseChatActivity extends WKBaseActivity<ActChooseChatLayoutBindin
     private void searchUser(String content) {
         currentKeyword = content == null ? "" : content;
         chooseChatAdapter.setList(filterList(allList, currentKeyword));
+        updateSelectAllBar();
+    }
+
+    /**
+     * 当前 Tab 经搜索过滤后可选的条目（跳过禁言/禁用 / 空 channel）。
+     */
+    private List<ChooseChatEntity> currentSelectableEntities() {
+        List<ChooseChatEntity> list = filterList(allList, currentKeyword);
+        List<ChooseChatEntity> result = new ArrayList<>();
+        for (ChooseChatEntity e : list) {
+            if (e == null) continue;
+            if (e.isBan || e.isForbidden) continue;
+            WKChannel ch = e.uiConveursationMsg == null ? null : e.uiConveursationMsg.getWkChannel();
+            if (ch == null) continue;
+            result.add(e);
+        }
+        return result;
+    }
+
+    private boolean isCurrentTabAllSelected(List<ChooseChatEntity> selectable) {
+        if (selectable == null || selectable.isEmpty()) return false;
+        for (ChooseChatEntity e : selectable) {
+            WKChannel ch = e.uiConveursationMsg.getWkChannel();
+            if (!selectedChannels.containsKey(entityKey(ch))) return false;
+        }
+        return true;
+    }
+
+    private int currentTabSelectedCount(List<ChooseChatEntity> selectable) {
+        if (selectable == null || selectable.isEmpty()) return 0;
+        int n = 0;
+        for (ChooseChatEntity e : selectable) {
+            WKChannel ch = e.uiConveursationMsg.getWkChannel();
+            if (selectedChannels.containsKey(entityKey(ch))) n++;
+        }
+        return n;
+    }
+
+    private void updateSelectAllBar() {
+        List<ChooseChatEntity> selectable = currentSelectableEntities();
+        int total = selectable.size();
+        int selected = currentTabSelectedCount(selectable);
+        boolean enabled = total > 0;
+        wkVBinding.selectAllLayout.setVisibility(View.VISIBLE);
+        wkVBinding.selectAllTv.setEnabled(enabled);
+        wkVBinding.selectAllTv.setAlpha(enabled ? 1.0f : 0.4f);
+        wkVBinding.selectAllTv.setText(
+                isCurrentTabAllSelected(selectable) ? R.string.unselect_all : R.string.select_all);
+        wkVBinding.selectAllCountTv.setText(
+                getString(R.string.selected_count_format, selected, total));
+    }
+
+    private void toggleSelectAllCurrentTab() {
+        List<ChooseChatEntity> selectable = currentSelectableEntities();
+        if (selectable.isEmpty()) return;
+        boolean allSelected = isCurrentTabAllSelected(selectable);
+        if (allSelected) {
+            // 取消全选：仅移除当前可见可选项。
+            for (ChooseChatEntity e : selectable) {
+                WKChannel ch = e.uiConveursationMsg.getWkChannel();
+                selectedChannels.remove(entityKey(ch));
+                e.isCheck = false;
+            }
+        } else {
+            // 全选：追加未选中的。
+            for (ChooseChatEntity e : selectable) {
+                WKChannel ch = e.uiConveursationMsg.getWkChannel();
+                String key = entityKey(ch);
+                if (!selectedChannels.containsKey(key)) {
+                    selectedChannels.put(key, ch);
+                    e.isCheck = true;
+                }
+            }
+        }
+        // 同步当前 Tab 未过滤列表的勾选状态与全局 selectedChannels
+        syncCheckStateForList(allList);
+        chooseChatAdapter.setList(filterList(allList, currentKeyword));
+        updateConfirmBtn();
+        updateSelectAllBar();
     }
 
     private List<ChooseChatEntity> filterList(List<ChooseChatEntity> source, String content) {
@@ -263,6 +341,7 @@ public class ChooseChatActivity extends WKBaseActivity<ActChooseChatLayoutBindin
         applyTabUI();
         syncCheckStateForList(allList);
         chooseChatAdapter.setList(filterList(allList, currentKeyword));
+        updateSelectAllBar();
     }
 
     private void applyTabUI() {
@@ -293,6 +372,7 @@ public class ChooseChatActivity extends WKBaseActivity<ActChooseChatLayoutBindin
         applyTabUI();
         chooseChatAdapter.setList(allList);
         rightBtn.setVisibility(View.GONE);
+        updateSelectAllBar();
     }
 
     private void loadRecent() {
@@ -373,6 +453,7 @@ public class ChooseChatActivity extends WKBaseActivity<ActChooseChatLayoutBindin
             if (currentTab == TAB_GROUP) {
                 syncCheckStateForList(groupList);
                 chooseChatAdapter.setList(filterList(groupList, currentKeyword));
+                updateSelectAllBar();
             }
         });
 
@@ -380,6 +461,7 @@ public class ChooseChatActivity extends WKBaseActivity<ActChooseChatLayoutBindin
         if (currentTab == TAB_GROUP) {
             syncCheckStateForList(groupList);
             chooseChatAdapter.setList(filterList(groupList, currentKeyword));
+            updateSelectAllBar();
         }
     }
 
@@ -395,6 +477,7 @@ public class ChooseChatActivity extends WKBaseActivity<ActChooseChatLayoutBindin
         if (currentTab == TAB_FRIEND) {
             syncCheckStateForList(friendList);
             chooseChatAdapter.setList(filterList(friendList, currentKeyword));
+            updateSelectAllBar();
         }
     }
 
