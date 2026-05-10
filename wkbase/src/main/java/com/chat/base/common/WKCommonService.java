@@ -5,6 +5,7 @@ import com.chat.base.entity.ChannelInfoEntity;
 import com.chat.base.entity.WKAPPConfig;
 import com.chat.base.entity.AppVersion;
 import com.chat.base.entity.WKChannelState;
+import com.chat.base.entity.CheckStatusResult;
 
 import java.util.List;
 
@@ -31,4 +32,9 @@ interface WKCommonService {
 
     @GET("common/appmodule")
     Observable<List<AppModule>> getAppModule();
+
+    // 客户端启动 / 从后台恢复时主动查询当前账号 / IP / 设备是否被管理后台封禁
+    // 配合 /v1/user/checkstatus 接口使用，服务端会按 uid → ip → device 顺序返回最先命中的维度
+    @GET("user/checkstatus")
+    Observable<CheckStatusResult> checkBanStatus(@Query("device_id") String deviceID);
 }

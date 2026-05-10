@@ -68,9 +68,11 @@ import com.chat.base.msgitem.WKMsgItemViewManager;
 import com.chat.base.net.HttpResponseCode;
 import com.chat.base.ui.components.AlertDialog;
 import com.chat.base.ui.components.AvatarView;
+import com.chat.base.common.WKCommonModel;
 import com.chat.base.utils.ActManagerUtils;
 import com.chat.base.utils.ImageUtils;
 import com.chat.base.utils.LayoutHelper;
+import com.chat.base.utils.WKDialogUtils;
 import com.chat.base.utils.WKFileUtils;
 import com.chat.base.utils.WKMediaFileUtils;
 import com.chat.base.utils.WKPermissions;
@@ -557,6 +559,43 @@ public class WKUIKitApplication {
     private ChatChooseContacts chooseChatCallBack;
     private ChooseContactsMenu contactsMenu;
     private List<WKMessageContent> messageContentList;
+
+    // 防止 checkStatus 和 forceLogout CMD 重复触发弹窗
+    private volatile boolean banStatusDialogShowing = false;
+
+    /**
+     * 启动 / 前台恢复时调用：查询当前登录态是否已被管理后台封禁，若是则弹窗提示并退出登录。
+     * 与 forceLogout CMD 处理互斥，确保同一次会话内不会弹出两个相同的退出提示。
+     */
+    public void checkBanStatusAndHandle() {
+        if (TextUtils.isEmpty(WKConfig.getInstance().getToken())) return;
+        if (banStatusDialogShowing) return;
+        WKCommonModel.getInstance().checkBanStatus(result -> {
+            if (result == null) return;
+            if (banStatusDialogShowing) return;
+            banStatusDialogShowing = true;
+            final String reason = TextUtils.isEmpty(result.reason) ? "您的账号已被管理员封禁" : result.reason;
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                android.app.Activity act = ActManagerUtils.getInstance().getCurrentActivity();
+                if (act == null || act.isFinishing()) {
+                    // 拿不到 Activity 直接退登，不再等待
+                    exitLogin(0);
+                    return;
+                }
+                WKDialogUtils.getInstance().showDialog(
+                        act,
+                        act.getString(R.string.login_out),
+                        reason,
+                        false,
+                        "",
+                        act.getString(R.string.sure),
+                        0,
+                        0,
+                        index -> exitLogin(0)
+                );
+            });
+        });
+    }
 
     public void exitLogin(int from) {
         MsgModel.getInstance().stopTimer();

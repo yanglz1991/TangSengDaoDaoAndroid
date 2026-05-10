@@ -79,6 +79,7 @@ import com.chat.base.utils.WKPermissions;
 import com.chat.base.utils.WKPlaySound;
 import com.chat.base.utils.WKReader;
 import com.chat.base.utils.WKTimeUtils;
+import com.chat.base.utils.MuteUtils;
 import com.chat.base.utils.WKToastUtils;
 import com.chat.base.utils.singleclick.SingleClickUtil;
 import com.chat.base.utils.systembar.WKStatusBarUtils;
@@ -270,6 +271,11 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
         initListener();
         //initData();
         ActManagerUtils.getInstance().addActivity(this);
+        // 全局禁言：进入聊天页时提示一次
+        String muteTip = MuteUtils.channelMuteTip(channelType);
+        if (!TextUtils.isEmpty(muteTip)) {
+            WKToastUtils.getInstance().showToast(muteTip);
+        }
     }
 
     @Override
@@ -1848,6 +1854,10 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
 
     @Override
     public void sendMessage(WKMessageContent messageContent) {
+        // 全局禁言拦截（管理后台「禁言设置」）
+        if (MuteUtils.blockIfChannelMuted(channelType)) {
+            return;
+        }
 
         if (messageContent.type == WKContentType.WK_TEXT && editMsg != null) {
             JSONObject jsonObject = messageContent.encodeMsg();

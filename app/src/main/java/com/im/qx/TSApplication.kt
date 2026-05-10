@@ -120,6 +120,11 @@ class TSApplication : MultiDexApplication() {
         // 若已登录，立即启动 IM 长连接保活服务（冷启动恢复登录态时生效）
         if (!TextUtils.isEmpty(WKConfig.getInstance().token)) {
             KeepAliveService.start(this)
+            // 冷启动时兜底检查一次封禁状态（防止客户端离线期间收到的 forceLogout CMD 丢失）
+            // 延迟 2s 等待 IM 长连建立 / Activity 创建，避免在 LaunchActivity 空窗期弹窗
+            Handler(Looper.getMainLooper()).postDelayed({
+                WKUIKitApplication.getInstance().checkBanStatusAndHandle()
+            }, 2000)
         }
     }
 
@@ -163,6 +168,8 @@ class TSApplication : MultiDexApplication() {
                     UserModel.getInstance().getOnlineUsers()
                     // 已登录状态下确保保活服务处于运行（幂等）
                     KeepAliveService.start(this@TSApplication)
+                    // 从后台回到前台也兜底检查一次封禁状态
+                    WKUIKitApplication.getInstance().checkBanStatusAndHandle()
                 }
             }
 

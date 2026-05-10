@@ -17,6 +17,7 @@ import com.chat.base.net.IRequestResultListener;
 import com.chat.base.net.entity.CommonResponse;
 import com.chat.base.utils.AndroidUtilities;
 import com.chat.base.utils.DispatchQueuePool;
+import com.chat.base.utils.MuteUtils;
 import com.chat.base.utils.WKReader;
 import com.chat.base.utils.WKTimeUtils;
 import com.chat.uikit.enity.UserInfo;
@@ -56,6 +57,13 @@ public class FriendModel extends WKBaseModel {
      * @param iCommonListener 返回
      */
     public void applyAddFriend(String uid, String vercode, String remark, final ICommonListener iCommonListener) {
+        // 全局群聊禁言：禁止添加好友
+        if (MuteUtils.blockIfGroupMuted()) {
+            if (iCommonListener != null) {
+                iCommonListener.onResult(HttpResponseCode.error, MuteUtils.groupMuteTip());
+            }
+            return;
+        }
         JSONObject jsonObject1 = new JSONObject();
         jsonObject1.put("to_uid", uid);
         jsonObject1.put("remark", remark);

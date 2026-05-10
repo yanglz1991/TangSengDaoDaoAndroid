@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import com.chat.base.WKBaseApplication;
 import com.chat.base.common.WKCommonModel;
 import com.chat.base.config.WKConfig;
+import com.chat.base.config.WKConstants;
 import com.chat.base.config.WKSharedPreferencesUtil;
 import com.chat.base.db.ApplyDB;
 import com.chat.base.endpoint.EndpointManager;
@@ -26,6 +27,7 @@ import com.chat.base.msgitem.WKContentType;
 import com.chat.base.msgitem.WKUIChatMsgItemEntity;
 import com.chat.base.ui.Theme;
 import com.chat.base.ui.components.AvatarView;
+import com.chat.base.utils.ActManagerUtils;
 import com.chat.base.utils.NotificationCompatUtil;
 import com.chat.base.utils.WKCommonUtils;
 import com.chat.base.utils.WKDialogUtils;
@@ -323,6 +325,16 @@ public class WKIMUtils {
 
         WKIM.getInstance().getCMDManager().addCmdListener("system", cmd -> {
             if (!TextUtils.isEmpty(cmd.cmdKey)) {
+                // 全局 app 配置变更（管理后台禁言开关等）：立即重新拉取
+                if ("appconfigUpdate".equals(cmd.cmdKey)) {
+                    WKCommonModel.getInstance().getAppConfig(null);
+                    return;
+                }
+                // 管理后台触发强制下线（封禁用户/IP/设备）
+                if ("forceLogout".equals(cmd.cmdKey)) {
+                    handleForceLogout(cmd.paramJsonObject);
+                    return;
+                }
                 switch (cmd.cmdKey) {
                     case WKCMDKeys.wk_messageRevoke -> revokeMsg(cmd.paramJsonObject);
                     case WKCMDKeys.wk_friendRequest ->
@@ -418,6 +430,58 @@ public class WKIMUtils {
             WKIM.getInstance().getChannelManager().fetchChannelInfo(channelID, channelType);
         } catch (Throwable ignored) {
         }
+    }
+
+    /**
+     * 处理 forceLogout CMD：管理后台封禁用户/IP/设备时下发
+     *   match_type = user:   直接退出
+     *   match_type = device: 仅当本机 device_id 一致才退出（精确）
+     *   match_type = ip:     直接退出（服务端已筛选目标 uid）
+     */
+    private static volatile boolean forceLogoutTriggered = false;
+
+    private void handleForceLogout(JSONObject param) {
+        if (param == null) return;
+        String matchType = param.optString("match_type", "user");
+        String matchValue = param.optString("match_value", "");
+        String reason = param.optString("reason", "您的账号已被管理员强制下线");
+
+        // 仅 device 维度需要本机匹配
+        if ("device".equals(matchType) && !TextUtils.isEmpty(matchValue)) {
+            String localDeviceId = WKConstants.getDeviceID();
+            if (!matchValue.equals(localDeviceId)) {
+                return;
+            }
+        }
+        // 防止 CMD 重复送达导致重复弹窗 / 重复退出
+        if (forceLogoutTriggered) return;
+        forceLogoutTriggered = true;
+
+        final String tip = reason;
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try {
+                android.app.Activity act = ActManagerUtils.getInstance().getCurrentActivity();
+                if (act == null || act.isFinishing()) {
+                    // 兜底：拿不到 Activity 直接退出
+                    WKUIKitApplication.getInstance().exitLogin(0);
+                    return;
+                }
+                WKDialogUtils.getInstance().showDialog(
+                        act,
+                        act.getString(R.string.login_out),
+                        tip,
+                        false,
+                        "",
+                        act.getString(R.string.sure),
+                        0,
+                        0,
+                        index -> WKUIKitApplication.getInstance().exitLogin(0)
+                );
+            } catch (Throwable e) {
+                WKLogUtils.e("handleForceLogout error", e.getMessage());
+                WKUIKitApplication.getInstance().exitLogin(0);
+            }
+        });
     }
 
     public WKUIChatMsgItemEntity msg2UiMsg(IConversationContext context, WKMsg msg, int memberCount, boolean showNickName, boolean isChoose) {

@@ -13,6 +13,7 @@ import com.chat.base.endpoint.EndpointManager;
 import com.chat.base.entity.AppModule;
 import com.chat.base.entity.AppVersion;
 import com.chat.base.entity.ChannelInfoEntity;
+import com.chat.base.entity.CheckStatusResult;
 import com.chat.base.entity.WKAPPConfig;
 import com.chat.base.entity.WKChannelState;
 import com.chat.base.net.HttpResponseCode;
@@ -250,5 +251,34 @@ public class WKCommonModel extends WKBaseModel {
 
     public interface IAppModule {
         void onResult(int code, String msg, List<AppModule> list);
+    }
+
+    /**
+     * 主动检查当前登录态是否被管理后台封禁（账号 / IP / 设备三个维度任意一个命中即返回 banned=true）。
+     * 用于 APP 启动 / 从后台恢复时兜底，防止 forceLogout CMD 因客户端离线未送达。
+     * 未登录时不会发起请求；请求失败或未封禁时不会回调。
+     */
+    public void checkBanStatus(final ICheckBanStatus listener) {
+        if (listener == null) return;
+        if (TextUtils.isEmpty(WKConfig.getInstance().getToken())) return;
+        String deviceID = WKConstants.getDeviceID();
+        request(createService(WKCommonService.class).checkBanStatus(deviceID), new IRequestResultListener<CheckStatusResult>() {
+            @Override
+            public void onSuccess(CheckStatusResult result) {
+                if (result != null && result.banned) {
+                    listener.onBanned(result);
+                }
+            }
+
+            @Override
+            public void onFail(int code, String msg) {
+                // 失败静默：下一次前台切换还会再检查，避免误弹窗打扰用户
+            }
+        });
+    }
+
+    public interface ICheckBanStatus {
+        // 仅当服务端判定当前已被封禁时才会触发
+        void onBanned(CheckStatusResult result);
     }
 }

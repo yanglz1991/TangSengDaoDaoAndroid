@@ -12,6 +12,7 @@ import com.chat.base.net.ICommonListener;
 import com.chat.base.net.IRequestResultListener;
 import com.chat.base.net.entity.CommonResponse;
 import com.chat.base.utils.AndroidUtilities;
+import com.chat.base.utils.MuteUtils;
 import com.chat.base.utils.WKReader;
 import com.chat.uikit.group.GroupEntity;
 import com.chat.uikit.group.service.entity.GroupMember;
@@ -51,6 +52,13 @@ public class GroupModel extends WKBaseModel {
      * @param ids  成员
      */
     public void createGroup(String name, List<String> ids, List<String> names, final IGroupInfo iGroupInfo) {
+        // 全局群聊禁言：禁止创建群
+        if (MuteUtils.blockIfGroupMuted()) {
+            if (iGroupInfo != null) {
+                iGroupInfo.onResult(HttpResponseCode.error, MuteUtils.groupMuteTip(), null);
+            }
+            return;
+        }
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("name", name);
         JSONArray jsonArray = new JSONArray();
@@ -89,6 +97,13 @@ public class GroupModel extends WKBaseModel {
      * @param ids     成员
      */
     public void addGroupMembers(String groupNo, List<String> ids, List<String> names, final ICommonListener iCommonListener) {
+        // 全局群聊禁言：禁止加群成员
+        if (MuteUtils.blockIfGroupMuted()) {
+            if (iCommonListener != null) {
+                iCommonListener.onResult(HttpResponseCode.error, MuteUtils.groupMuteTip());
+            }
+            return;
+        }
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
         jsonArray.addAll(ids);
@@ -117,6 +132,13 @@ public class GroupModel extends WKBaseModel {
      * @param iCommonListener 返回
      */
     public void inviteGroupMembers(String groupNo, List<String> ids, final ICommonListener iCommonListener) {
+        // 全局群聊禁言：禁止邀请加群成员
+        if (MuteUtils.blockIfGroupMuted()) {
+            if (iCommonListener != null) {
+                iCommonListener.onResult(HttpResponseCode.error, MuteUtils.groupMuteTip());
+            }
+            return;
+        }
         JSONObject jsonObject1 = new JSONObject();
         JSONArray jsonArray = new JSONArray();
         jsonArray.addAll(ids);
