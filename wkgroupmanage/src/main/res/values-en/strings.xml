@@ -13,6 +13,11 @@
     <string name="choose_new_group_admin">New Leader</string>
     <string name="choose_new_group_admin_desc">Selecting %s as new owner will release your ownership.</string>
     <string name="group_approve">To audit</string>
+    <string name="group_approval_records">Approval Records</string>
+    <string name="group_approval_records_explain">Only invitations pending approval are shown here. Rejected ones are hidden. Tap to approve or reject.</string>
+    <string name="group_approval_empty">No invitations pending approval</string>
+    <string name="group_approval_status_wait">Pending</string>
+    <string name="group_approval_content_format">Invited %1$d friend(s): %2$s</string>
     <string name="black_list">Blacklist</string>
     <string name="remove_user_in_black_list">Are you sure you want to remove %s from the blacklist</string>
     <string name="group_manager_members">Members</string>

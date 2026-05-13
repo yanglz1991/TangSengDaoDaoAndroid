@@ -12,6 +12,7 @@ import com.chat.base.net.ud.WKUploader;
 import com.chat.base.utils.WKTimeUtils;
 import com.chat.groupmanage.entity.ForbiddenTime;
 import com.chat.groupmanage.entity.H5ConfirmUrl;
+import com.chat.groupmanage.entity.InviteApprovalEntity;
 
 import java.util.List;
 
@@ -154,6 +155,30 @@ public class GroupManageModel extends WKBaseModel {
         });
     }
 
+
+    /**
+     * 获取群待审核邀请列表
+     *
+     * @param groupId  群编号
+     * @param listener 返回结果回调
+     */
+    public void getPendingInvites(String groupId, final IPendingInvitesListener listener) {
+        request(createService(GroupManageService.class).getPendingInvites(groupId), new IRequestResultListener<List<InviteApprovalEntity>>() {
+            @Override
+            public void onSuccess(List<InviteApprovalEntity> result) {
+                listener.onResult(HttpResponseCode.success, "", result);
+            }
+
+            @Override
+            public void onFail(int code, String msg) {
+                listener.onResult(code, msg, null);
+            }
+        });
+    }
+
+    public interface IPendingInvitesListener {
+        void onResult(int code, String msg, List<InviteApprovalEntity> list);
+    }
 
     public void forbiddenTimeList(IForbiddenTimeList iForbiddenTimeList) {
         request(createService(GroupManageService.class).forbiddenTimeList(), new IRequestResultListener<List<ForbiddenTime>>() {

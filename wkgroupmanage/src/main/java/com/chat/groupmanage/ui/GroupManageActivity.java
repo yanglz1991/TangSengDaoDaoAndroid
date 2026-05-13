@@ -124,6 +124,11 @@ public class GroupManageActivity extends WKBaseActivity<ActGroupManageLayoutBind
             intent.putExtra("groupId", groupId);
             startActivity(intent);
         });
+        SingleClickUtil.onSingleClick(wkVBinding.approvalRecordsLayout, view1 -> {
+            Intent intent = new Intent(this, GroupApprovalListActivity.class);
+            intent.putExtra("groupId", groupId);
+            startActivity(intent);
+        });
         SingleClickUtil.onSingleClick(wkVBinding.outUserLayout, view1 -> {
             Intent intent = new Intent(this, OutGroupMembersActivity.class);
             intent.putExtra("groupId", groupId);

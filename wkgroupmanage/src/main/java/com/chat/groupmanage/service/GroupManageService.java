@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.chat.base.net.entity.CommonResponse;
 import com.chat.groupmanage.entity.ForbiddenTime;
 import com.chat.groupmanage.entity.H5ConfirmUrl;
+import com.chat.groupmanage.entity.InviteApprovalEntity;
 
 import java.util.List;
 
@@ -36,6 +37,9 @@ public interface GroupManageService {
 
     @GET("groups/{groupNo}/member/h5confirm")
     Observable<H5ConfirmUrl> getH5confirmUrl(@Path("groupNo") String groupNo, @Query("invite_no") String invite_no);
+
+    @GET("groups/{groupNo}/member/invites")
+    Observable<List<InviteApprovalEntity>> getPendingInvites(@Path("groupNo") String groupNo);
 
     @POST("groups/{groupNo}/blacklist/{action}")
     Observable<CommonResponse> addOrRemoveBlackList(@Path("groupNo") String groupNo, @Path("action") String action, @Body JSONObject jsonObject);
