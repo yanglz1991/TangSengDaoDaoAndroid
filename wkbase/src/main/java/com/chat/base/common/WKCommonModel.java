@@ -3,6 +3,7 @@ package com.chat.base.common;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.chat.base.R;
 import com.chat.base.WKBaseApplication;
 import com.chat.base.base.WKBaseModel;
@@ -18,6 +19,7 @@ import com.chat.base.entity.WKAPPConfig;
 import com.chat.base.entity.WKChannelState;
 import com.chat.base.net.HttpResponseCode;
 import com.chat.base.net.IRequestResultListener;
+import com.chat.base.net.entity.CommonResponse;
 import com.chat.base.utils.AndroidUtilities;
 import com.chat.base.utils.DispatchQueuePool;
 import com.chat.base.utils.WKDeviceUtils;
@@ -280,5 +282,25 @@ public class WKCommonModel extends WKBaseModel {
     public interface ICheckBanStatus {
         // 仅当服务端判定当前已被封禁时才会触发
         void onBanned(CheckStatusResult result);
+    }
+
+    /**
+     * 上报消息已读（用于私聊"对方是否已读"标记）
+     */
+    public void readMsg(String channelID, byte channelType, List<String> msgIds) {
+        if (WKReader.isEmpty(msgIds)) return;
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("channel_id", channelID);
+        jsonObject.put("channel_type", channelType);
+        jsonObject.put("message_ids", msgIds);
+        request(createService(WKCommonService.class).readedMsg(jsonObject), new IRequestResultListener<CommonResponse>() {
+            @Override
+            public void onSuccess(CommonResponse result) {
+            }
+
+            @Override
+            public void onFail(int code, String msg) {
+            }
+        });
     }
 }

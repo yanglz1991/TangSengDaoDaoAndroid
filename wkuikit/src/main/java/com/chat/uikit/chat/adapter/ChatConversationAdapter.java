@@ -219,8 +219,8 @@ public class ChatConversationAdapter extends BaseQuickAdapter<ChatConversationMs
             sendingMsgIv.setVisibility(View.VISIBLE);
             boolean isError = false;
             if (status == WKSendMsgResult.send_success) {
-                // 自己发送
-                if (item.getWkMsg().setting.receipt == 1 && item.getWkMsg().remoteExtra.readedCount > 0) {
+                // 自己发送：已读双勾仅在私聊显示，群聊不开启该功能
+                if (item.getWkMsg().channelType == WKChannelType.PERSONAL && item.getWkMsg().setting.receipt == 1 && item.getWkMsg().remoteExtra.readedCount > 0) {
                     drawable = new RLottieDrawable(getContext(), R.raw.ticks_double, "ticks_double", AndroidUtilities.dp(22), AndroidUtilities.dp(22));
                     isSingle = false;
                 } else {

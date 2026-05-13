@@ -242,7 +242,7 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
                 WKUIKitApplication.getInstance().showChatConfirmDialog(this, list, msgContentList, (list1, messageContentList) -> {
                     List<SendMsgEntity> msgList = new ArrayList<>();
                     WKSendOptions options = new WKSendOptions();
-                    options.setting.receipt = getChatChannelInfo().receipt;
+                    options.setting.receipt = (byte) (channelType == WKChannelType.PERSONAL ? 1 : 0);
                     for (int i = 0, size = msgContentList.size(); i < size; i++) {
                         msgList.add(new SendMsgEntity(msgContentList.get(i), channel, options));
                     }
@@ -2151,7 +2151,8 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
             wkMsg.viewed = 1;
         }
 
-        if (wkMsg.remoteExtra.readed == 0 && wkMsg.setting != null && wkMsg.setting.receipt == 1 && !TextUtils.isEmpty(wkMsg.fromUID) && !wkMsg.fromUID.equals(loginUID)) {
+        // 仅私聊上报已读，群聊不开启已读回执功能
+        if (channelType == WKChannelType.PERSONAL && wkMsg.remoteExtra.readed == 0 && wkMsg.setting != null && wkMsg.setting.receipt == 1 && !TextUtils.isEmpty(wkMsg.fromUID) && !wkMsg.fromUID.equals(loginUID)) {
             boolean isAdd = true;
             for (int j = 0, size = readMsgIds.size(); j < size; j++) {
                 if (readMsgIds.get(j).equals(wkMsg.messageID)) {
@@ -2449,7 +2450,8 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
                             wkVBinding.chatUnreadLayout.newMsgLayout.post(() -> CommonAnim.getInstance().showOrHide(wkVBinding.chatUnreadLayout.newMsgLayout, redDot > 0, true, false));
                         } else {
                             scrollToEnd();
-                            if (msg.setting.receipt == 1) readMsgIds.add(msg.messageID);
+                            // 仅私聊上报已读，群聊不开启已读回执
+                            if (channelType == WKChannelType.PERSONAL && msg.setting.receipt == 1) readMsgIds.add(msg.messageID);
                         }
                     }
                 }

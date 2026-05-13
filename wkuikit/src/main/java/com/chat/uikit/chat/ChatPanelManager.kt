@@ -2093,7 +2093,8 @@ class ChatPanelManager(
 
                                                 for (mChannel: WKChannel in channelList) {
                                                     val option = WKSendOptions()
-                                                    option.setting.receipt = mChannel.receipt
+                                                    option.setting.receipt =
+                                                        if (mChannel.channelType == WKChannelType.PERSONAL) 1 else 0
                                                     WKIM.getInstance().msgManager.sendWithOptions(
                                                         forwardContent,
                                                         mChannel,
@@ -2167,7 +2168,7 @@ class ChatPanelManager(
                                                         for (index in list.indices) {
                                                             val option = WKSendOptions()
                                                             option.setting.receipt =
-                                                                iConversationContext.chatChannelInfo.receipt
+                                                                if (mChannel.channelType == WKChannelType.PERSONAL) 1 else 0
                                                             sendMsgEntityList.add(
                                                                 SendMsgEntity(
                                                                     list[index], mChannel,

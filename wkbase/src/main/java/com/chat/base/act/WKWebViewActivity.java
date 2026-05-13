@@ -120,7 +120,7 @@ public class WKWebViewActivity extends WKBaseActivity<ActWebvieiwLayoutBinding> 
                 public void onResult(List<WKChannel> list) {
                     for (WKChannel channel : list) {
                         WKSendOptions options = new WKSendOptions();
-                        options.setting.receipt = channel.receipt;
+                        options.setting.receipt = (byte) (channel.channelType == WKChannelType.PERSONAL ? 1 : 0);
                         WKIM.getInstance().getMsgManager().sendWithOptions(textContent, channel,options);
                     }
                 }

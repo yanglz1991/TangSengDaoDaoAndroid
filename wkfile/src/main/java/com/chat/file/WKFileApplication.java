@@ -22,6 +22,7 @@ import com.chat.file.msgitem.FileContent;
 import com.chat.file.msgitem.FileProvider;
 import com.xinbida.wukongim.WKIM;
 import com.xinbida.wukongim.entity.WKChannel;
+import com.xinbida.wukongim.entity.WKChannelType;
 import com.xinbida.wukongim.entity.WKMsgSetting;
 import com.xinbida.wukongim.message.type.WKMsgContentType;
 
@@ -94,7 +95,7 @@ public class WKFileApplication {
             EndpointManager.getInstance().invoke(EndpointSID.showChooseChatView, new ChooseChatMenu(new ChatChooseContacts(list -> {
                 for (WKChannel channel : list) {
                     WKMsgSetting setting = new WKMsgSetting();
-                    setting.receipt = channel.receipt;
+                    setting.receipt = (byte) (channel.channelType == WKChannelType.PERSONAL ? 1 : 0);
 //                    setting.signal = 0;
                     WKIM.getInstance().getMsgManager().sendMessage(fileContent, setting, channel.channelID, channel.channelType);
                 }

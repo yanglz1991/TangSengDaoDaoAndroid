@@ -30,6 +30,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.shuyu.gsyvideoplayer.builder.GSYVideoOptionBuilder;
 import com.xinbida.wukongim.WKIM;
 import com.xinbida.wukongim.entity.WKChannel;
+import com.xinbida.wukongim.entity.WKChannelType;
 import com.xinbida.wukongim.entity.WKMsg;
 import com.xinbida.wukongim.entity.WKMsgSetting;
 import com.xinbida.wukongim.interfaces.IRefreshMsg;
@@ -209,7 +210,7 @@ public class PlayVideoActivity extends GSYBaseActivityDetail<VideoPlayer> {
                                         msgContent.mentionAll = 0;
                                         msgContent.mentionInfo = null;
                                         WKMsgSetting setting = new WKMsgSetting();
-                                        setting.receipt = channel.receipt;
+                                        setting.receipt = (byte) (channel.channelType == WKChannelType.PERSONAL ? 1 : 0);
 //                                    setting.signal = 0;
                                         WKIM.getInstance().getMsgManager().sendMessage(
                                                 msgContent,

@@ -18,13 +18,18 @@ import android.os.Process
 import android.text.TextUtils
 import androidx.multidex.MultiDexApplication
 import com.chat.base.WKBaseApplication
+import com.chat.base.common.WKCommonModel
 import com.chat.base.config.WKApiConfig
 import com.chat.base.config.WKConfig
 import com.chat.base.config.WKConstants
 import com.chat.base.config.WKSharedPreferencesUtil
 import com.chat.base.endpoint.EndpointCategory
 import com.chat.base.endpoint.EndpointManager
+import com.chat.base.endpoint.EndpointSID
 import com.chat.base.endpoint.entity.LoginMenu
+import com.chat.base.endpoint.entity.ReadMsgMenu
+import com.chat.base.endpoint.entity.WKSendMsgMenu
+import com.xinbida.wukongim.entity.WKChannelType
 import com.chat.base.ui.Theme
 import com.chat.base.utils.ActManagerUtils
 import com.chat.base.utils.WKPlaySound
@@ -190,6 +195,26 @@ class TSApplication : MultiDexApplication() {
             "ts_keep_alive_on_login",
             EndpointCategory.loginMenus
         ) { LoginMenu { KeepAliveService.start(this@TSApplication) } }
+
+        // 已读回执相关：私聊默认开启已读，群聊不开启
+        // 发送消息时按频道类型覆盖 setting.receipt，避免依赖服务端 channel.receipt 设置
+        // 注意 WKSendMsgUtils 通过 invokes(category) 触发，必须把 category 设置为 EndpointSID.sendMessage
+        EndpointManager.getInstance().setMethod(
+            "ts_send_message_receipt", EndpointSID.sendMessage
+        ) { obj ->
+            if (obj is WKSendMsgMenu) {
+                obj.option.setting.receipt =
+                    if (obj.channel.channelType == WKChannelType.PERSONAL) 1 else 0
+            }
+            null
+        }
+        // 上报"消息已读"，对应付费模块中的 message/readed 接口
+        EndpointManager.getInstance().setMethod("read_msg") { obj ->
+            if (obj is ReadMsgMenu && obj.channelType == WKChannelType.PERSONAL) {
+                WKCommonModel.getInstance().readMsg(obj.channelID, obj.channelType, obj.msgIds)
+            }
+            null
+        }
 
         EndpointManager.getInstance().setMethod("main_show_home_view") { `object` ->
             // exitLogin() 会调用 main_show_home_view 跳回登录页，在此统一停止保活服务

@@ -220,7 +220,8 @@ open class WKTextProvider : WKChatBaseProvider() {
                                             textContent.mentionAll = 0
                                             textContent.mentionInfo = null
                                             val option = WKSendOptions()
-                                            option.setting.receipt = mChannel.receipt
+                                            option.setting.receipt =
+                                                if (mChannel.channelType == WKChannelType.PERSONAL) 1 else 0
                                             WKIM.getInstance().msgManager.sendWithOptions(
                                                 textContent,
                                                 mChannel, option

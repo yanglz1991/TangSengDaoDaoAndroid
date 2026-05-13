@@ -101,11 +101,7 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
 //            wkVBinding.findContentLayout.addView(findMsgView);
 //        }
 
-        View msgReceiptView = (View) EndpointManager.getInstance().invoke("msg_receipt_view", new ChatSettingCellMenu(groupNo, WKChannelType.GROUP, wkVBinding.msgSettingLayout));
-        if (msgReceiptView != null) {
-            wkVBinding.msgSettingLayout.removeAllViews();
-            wkVBinding.msgSettingLayout.addView(msgReceiptView);
-        }
+        // 群聊不展示已读回执入口
 
         View msgPrivacyLayout = (View) EndpointManager.getInstance().invoke("chat_setting_msg_privacy", new ChatSettingCellMenu(groupNo, WKChannelType.GROUP, wkVBinding.msgSettingLayout));
         if (msgPrivacyLayout != null) {

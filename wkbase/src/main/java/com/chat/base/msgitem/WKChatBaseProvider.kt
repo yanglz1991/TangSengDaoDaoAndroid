@@ -752,7 +752,8 @@ abstract class WKChatBaseProvider : BaseItemProvider<WKUIChatMsgItemEntity>() {
             )
         if (mMsg.remoteExtra.needUpload == 1) mMsg.status = WKSendMsgResult.send_loading
         if (fromType == WKChatIteMsgFromType.SEND) {
-            if (mMsg.setting.receipt == 1 && mMsg.remoteExtra.readedCount > 0) {
+            // 已读双勾仅在私聊显示，群聊不开启该功能
+            if (mMsg.channelType == WKChannelType.PERSONAL && mMsg.setting.receipt == 1 && mMsg.remoteExtra.readedCount > 0) {
                 drawable = RLottieDrawable(
                     context,
                     R.raw.ticks_double,
@@ -1017,7 +1018,8 @@ abstract class WKChatBaseProvider : BaseItemProvider<WKUIChatMsgItemEntity>() {
                                                 msgContent.mentionAll = 0
                                                 msgContent.mentionInfo = null
                                                 val option = WKSendOptions()
-                                                option.setting.receipt = mChannel.receipt
+                                                option.setting.receipt =
+                                                    if (mChannel.channelType == WKChannelType.PERSONAL) 1 else 0
                                                 WKIM.getInstance().msgManager.sendWithOptions(
                                                     msgContent,
                                                     mChannel, option
