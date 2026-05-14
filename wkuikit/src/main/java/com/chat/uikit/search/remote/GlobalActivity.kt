@@ -177,10 +177,8 @@ class GlobalActivity : WKBaseActivity<ActGlobalLayoutBinding>() {
                         list.add(spanVO)
                     }
 
-                    val searchVO = DataVO(DataVO.SEARCH, null, null, keyword)
-                    list.add(searchVO)
-                    val spanVO = DataVO(DataVO.SPAN, null, null, "")
-                    list.add(spanVO)
+                    // 移除首页搜索结果中的"查找用户"入口（DataVO.SEARCH，跳到 SearchUserActivity 加好友）。
+                    // 该入口与首页全局搜索语义不一致，且后续不再暴露添加好友的 phone/short 搜索能力。
                     if (WKReader.isNotEmpty(resp.messages)) {
                         val textVO =
                             DataVO(DataVO.TEXT, null, null, getString(R.string.chat_records))
