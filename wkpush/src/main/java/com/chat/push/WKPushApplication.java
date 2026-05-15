@@ -2,6 +2,7 @@ package com.chat.push;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -244,14 +245,32 @@ public class WKPushApplication {
 //        });
     }
 
+    /**
+     * 兜底注册新消息通知渠道（仅在 TSApplication 还没创建过渠道时生效，
+     * 避免在 wkpush 初始化早于 app 主入口时首次以低重要级别创建并锁死渠道）。
+     * 行为必须与 TSApplication.createNotificationChannel 保持一致：
+     * IMPORTANCE_HIGH + VISIBILITY_PUBLIC，确保锁屏可以弹出 heads-up 横幅。
+     */
     private static void notifyChannel(Application context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String channelId = WKConstants.newMsgChannelID;
-            String channelName = "Default_Channel";
-            String channelDescription = "this is default channel!";
-            NotificationChannel mNotificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
-            mNotificationChannel.setDescription(channelDescription);
-            ((NotificationManager) context.getSystemService(Activity.NOTIFICATION_SERVICE)).createNotificationChannel(mNotificationChannel);
+            NotificationManager nm = (NotificationManager) context.getSystemService(Activity.NOTIFICATION_SERVICE);
+            if (nm == null) return;
+            // 同步清理历史 IMPORTANCE_DEFAULT 老渠道
+            try {
+                nm.deleteNotificationChannel(WKConstants.legacyNewMsgChannelID);
+            } catch (Throwable ignored) {
+            }
+            // 兜底名称硬编码，避免 wkpush 反向依赖 wkuikit 资源；
+            // 正式渠道名称由 TSApplication.createNotificationChannel 写入（同 channelId 时
+            // 系统允许更新 name/description）。
+            NotificationChannel channel = new NotificationChannel(
+                    WKConstants.newMsgChannelID,
+                    "新消息通知",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.enableVibration(true);
+            nm.createNotificationChannel(channel);
         }
     }
 }

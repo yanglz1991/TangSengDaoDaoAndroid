@@ -104,6 +104,9 @@ class NotificationCompatUtil {
                 NotificationChannel(channel.channelId, channel.name, channel.importance)
             notificationChannel.description = channel.description   // 描述
             notificationChannel.vibrationPattern = channel.vibrate  // 震动模式
+            // 锁屏可见性必须在渠道首次创建时写入（之后无法再改），
+            // 否则即使 importance=HIGH，锁屏也只会显示"X 应用收到一条消息"而看不到内容。
+            notificationChannel.lockscreenVisibility = channel.lockScreenVisibility
             notificationChannel.setSound(channel.sound ?: Settings.System.DEFAULT_NOTIFICATION_URI, notificationChannel.audioAttributes)    // 声音
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -10,8 +10,16 @@ import java.util.UUID;
 
 public class WKConstants {
     public static final String refreshContacts = "refresh_contacts";
-    public static final String newMsgChannelID = "wk_new_msg_notification";
-    public static final String newRTCChannelID = "wk_new_rtc_notification";
+    // 通知渠道 id（v2）：
+    // - Android 8.0+ 一旦渠道被首次创建，importance / lockscreenVisibility 等行为属性
+    //   就会被系统锁定，App 端无法再修改。历史版本以 IMPORTANCE_DEFAULT 注册了
+    //   "wk_new_msg_notification" / "wk_new_rtc_notification"，导致锁屏只有声音、
+    //   不弹横幅，因此这里整体切到带 _v2 后缀的新 id，并在启动时主动删除旧渠道。
+    public static final String newMsgChannelID = "wk_new_msg_notification_v2";
+    public static final String newRTCChannelID = "wk_new_rtc_notification_v2";
+    /** 历史 channelId（仅供启动时清理，不要再用于发通知）。 */
+    public static final String legacyNewMsgChannelID = "wk_new_msg_notification";
+    public static final String legacyNewRTCChannelID = "wk_new_rtc_notification";
     public static String imageDir;
     public static String videoDir;
     public static String voiceDir;

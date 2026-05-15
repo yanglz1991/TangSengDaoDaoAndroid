@@ -243,24 +243,36 @@ class TSApplication : MultiDexApplication() {
 
 
     private fun createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
+        // Android 8.0+ 才有 NotificationChannel 概念
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = applicationContext.getSystemService(
+                NotificationManager::class.java
+            )
+            // 清理历史渠道：老渠道使用 IMPORTANCE_DEFAULT 且未设置 lockscreenVisibility，
+            // 锁屏没有横幅。Android 不允许 in-place 升级渠道行为，因此删除旧 id 让用户
+            // 设置页不残留无用项，新通知统一走 v2 channelId。
+            runCatching {
+                notificationManager.deleteNotificationChannel(WKConstants.legacyNewMsgChannelID)
+                notificationManager.deleteNotificationChannel(WKConstants.legacyNewRTCChannelID)
+            }
+
             val name: CharSequence = applicationContext.getString(R.string.new_msg_notification)
             val description = applicationContext.getString(R.string.new_msg_notification_desc)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(WKConstants.newMsgChannelID, name, importance)
+            // IMPORTANCE_HIGH：锁屏 / 解锁状态都会以浮动通知（heads-up）形式弹出
+            val channel = NotificationChannel(
+                WKConstants.newMsgChannelID,
+                name,
+                NotificationManager.IMPORTANCE_HIGH
+            )
             channel.description = description
-            channel.enableVibration(true) //是否有震动
+            channel.enableVibration(true) // 是否有震动
+            // 锁屏完整显示标题/正文，解决"锁屏只有声音没有顶部信息"的问题
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             channel.setSound(
                 Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + applicationContext.packageName + "/" + R.raw.newmsg),
                 Notification.AUDIO_ATTRIBUTES_DEFAULT
             )
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            val notificationManager = applicationContext.getSystemService(
-                NotificationManager::class.java
-            )
+            // 渠道一旦创建后无法再修改 importance / lockscreenVisibility 等行为属性
             notificationManager.createNotificationChannel(channel)
         }
         createNotificationRTCChannel()
@@ -270,17 +282,20 @@ class TSApplication : MultiDexApplication() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name: CharSequence = applicationContext.getString(R.string.new_rtc_notification)
             val description = applicationContext.getString(R.string.new_rtc_notification_desc)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(WKConstants.newRTCChannelID, name, importance)
+            // 通话需要锁屏弹出，必须 IMPORTANCE_HIGH + VISIBILITY_PUBLIC
+            val channel = NotificationChannel(
+                WKConstants.newRTCChannelID,
+                name,
+                NotificationManager.IMPORTANCE_HIGH
+            )
             channel.description = description
             channel.enableVibration(true)
             channel.vibrationPattern = longArrayOf(0, 100, 100, 100, 100, 100)
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             channel.setSound(
                 Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + applicationContext.packageName + "/" + R.raw.newrtc),
                 Notification.AUDIO_ATTRIBUTES_DEFAULT
             )
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
             val notificationManager = applicationContext.getSystemService(
                 NotificationManager::class.java
             )
