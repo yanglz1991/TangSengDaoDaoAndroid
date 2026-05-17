@@ -387,7 +387,11 @@ public class WKDialogUtils {
         //ProgressBar progressBar = view.findViewById(R.id.progressBar);
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context, R.style.AlertDialog);
         view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
-//        builder.setCancelable(versionEntity.is_force == 0);
+        // 强制更新（is_force == 1）时：
+        //   1) setCancelable(false)：禁止 Back 键 / Android 10+ 侧滑返回手势 关闭弹窗
+        //   2) setCanceledOnTouchOutside(false)：禁止点击 Dialog 外部关闭
+        // 仅靠 setCanceledOnTouchOutside(false) 不够，侧滑手势在 Dialog 上等价于 Back 键。
+        builder.setCancelable(versionEntity.is_force == 0);
         android.app.AlertDialog alertDialog = builder.create();
         alertDialog.setCanceledOnTouchOutside(versionEntity.is_force == 0);
         alertDialog.show();
@@ -415,8 +419,16 @@ public class WKDialogUtils {
             DownloadApkUtils.getInstance().downloadAPK(WKBaseApplication.getInstance().getContext(),
                     versionEntity.app_version,
                     WKApiConfig.getShowUrl(versionEntity.download_url));
-            alertDialog.dismiss();
-
+            if (versionEntity.is_force == 0) {
+                // 非强制更新：保持原行为，下载在后台进行，关闭弹窗让用户继续使用
+                alertDialog.dismiss();
+            } else {
+                // 强制更新：保持弹窗显示，禁用按钮防止重复点击/取消，
+                // 用户必须等下载完成后系统跳转安装页才能继续。即使从安装页返回 app，
+                // 因 setCancelable(false) 弹窗仍然锁死，无法绕过。
+                sureBtn.setEnabled(false);
+                sureBtn.setText(R.string.downloading);
+            }
         });
 
     }

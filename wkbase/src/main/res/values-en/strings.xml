@@ -50,6 +50,7 @@
     <string name="version_desc">Version description</string>
     <string name="find_new_version">New version found</string>
     <string name="update_now">Update right now</string>
+    <string name="downloading">Downloading…</string>
     <string name="new_version">New Version</string>
     <string name="kit_user_agreement">User Agreement</string>
     <string name="kit_privacy_policy">Privacy Policy</string>
