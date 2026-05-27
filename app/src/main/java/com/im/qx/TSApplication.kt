@@ -31,7 +31,10 @@ import com.chat.base.endpoint.entity.ReadMsgMenu
 import com.chat.base.endpoint.entity.WKSendMsgMenu
 import com.xinbida.wukongim.entity.WKChannelType
 import com.chat.base.ui.Theme
+import com.chat.base.entity.AppVersion
 import com.chat.base.utils.ActManagerUtils
+import com.chat.base.utils.WKDeviceUtils
+import com.chat.base.utils.WKDialogUtils
 import com.chat.base.utils.WKPlaySound
 import com.chat.base.utils.WKTimeUtils
 import com.chat.base.utils.language.WKMultiLanguageUtil
@@ -175,6 +178,9 @@ class TSApplication : MultiDexApplication() {
                     KeepAliveService.start(this@TSApplication)
                     // 从后台回到前台也兜底检查一次封禁状态
                     WKUIKitApplication.getInstance().checkBanStatusAndHandle()
+                    // 强制更新检查：冷启动 + 后台切回前台都会触发 onFront()
+                    // 延迟 1500ms 等待当前 Activity 完成 resume，确保弹窗 context 有效
+                    checkAppNewVersion()
                 }
             }
 
@@ -186,6 +192,29 @@ class TSApplication : MultiDexApplication() {
                     .putLong("lock_start_time", WKTimeUtils.getInstance().currentSeconds)
             }
         })
+    }
+
+    /**
+     * 检查应用是否有新版本，并在最顶层 Activity 上弹出更新提示。
+     * 触发时机：冷启动首次进入前台 + 每次从后台切回前台（由 AppFrontBackHelper.onFront 调用）。
+     *
+     * - 延迟 1500ms 等待当前 Activity 完成 resume，避免 Launch / Splash 跳转空窗期 context 失效；
+     * - 用 ActManagerUtils.currentActivity 拿最顶层 Activity 作为弹窗 context，保证任意页面回前台都能弹；
+     * - 复用 WKDialogUtils.showNewVersionDialog（与 TabActivity / WKAboutActivity 行为一致）。
+     */
+    private fun checkAppNewVersion() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            WKCommonModel.getInstance()
+                .getAppNewVersion(false) { version: AppVersion? ->
+                    val activity = ActManagerUtils.getInstance().currentActivity
+                    if (activity == null || activity.isFinishing) return@getAppNewVersion
+                    if (version == null || TextUtils.isEmpty(version.download_url)) return@getAppNewVersion
+                    val localV = WKDeviceUtils.getInstance().getVersionName(activity)
+                    if (WKDeviceUtils.isRemoteVersionNewer(version.app_version, localV)) {
+                        WKDialogUtils.getInstance().showNewVersionDialog(activity, version)
+                    }
+                }
+        }, 1500)
     }
 
     private fun addListener() {

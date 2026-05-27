@@ -36,7 +36,6 @@ import com.chat.base.ui.Theme;
 import com.chat.base.ui.components.CounterView;
 import com.chat.base.utils.ActManagerUtils;
 import com.chat.base.utils.LayoutHelper;
-import com.chat.base.utils.WKDeviceUtils;
 import com.chat.base.utils.WKDialogUtils;
 import com.chat.base.utils.WKReader;
 import com.chat.base.utils.WKTimeUtils;
@@ -137,13 +136,8 @@ public class TabActivity extends WKBaseActivity<ActTabMainBinding> {
         fragments.add(new MyFragment());
 
         wkVBinding.vp.setAdapter(new WKFragmentStateAdapter(this, fragments));
-        WKCommonModel.getInstance().getAppNewVersion(false, version -> {
-            String v = WKDeviceUtils.getInstance().getVersionName(TabActivity.this);
-            if (version != null && !TextUtils.isEmpty(version.download_url)
-                    && WKDeviceUtils.isRemoteVersionNewer(version.app_version, v)) {
-                WKDialogUtils.getInstance().showNewVersionDialog(TabActivity.this, version);
-            }
-        });
+        // 版本更新检查已统一挪到 TSApplication.onFront()，
+        // 覆盖冷启动 + 后台切回前台两种场景，避免在此重复触发。
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
         WKCommonModel.getInstance().getAppConfig(null);
@@ -336,8 +330,11 @@ public class TabActivity extends WKBaseActivity<ActTabMainBinding> {
         if (index == 0) {
             lastClickChatTabTime = 0;
             meIV.setImageResource(R.mipmap.ic_mine_n);
+            meIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
             contactsIV.setImageResource(R.mipmap.ic_contacts_n);
+            contactsIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
             chatIV.setImageResource(R.mipmap.ic_chat_s);
+            chatIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_selected));
 //            workplaceIV.setImageResource(R.mipmap.ic_contacts_n);
             if (isShowTabText) {
                 chatTV.setTextColor(ContextCompat.getColor(this, R.color.tab_text_selected));
@@ -346,8 +343,11 @@ public class TabActivity extends WKBaseActivity<ActTabMainBinding> {
             }
         } else if (index == 1) {
             meIV.setImageResource(R.mipmap.ic_mine_n);
+            meIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
             chatIV.setImageResource(R.mipmap.ic_chat_n);
+            chatIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
             contactsIV.setImageResource(R.mipmap.ic_contacts_s);
+            contactsIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_selected));
 //            workplaceIV.setImageResource(R.mipmap.ic_contacts_n);
             if (isShowTabText) {
                 chatTV.setTextColor(ContextCompat.getColor(this, R.color.tab_text_normal));
@@ -356,8 +356,11 @@ public class TabActivity extends WKBaseActivity<ActTabMainBinding> {
             }
         } else if (index == 2) {
             meIV.setImageResource(R.mipmap.ic_mine_n);
+            meIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
             chatIV.setImageResource(R.mipmap.ic_chat_n);
+            chatIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
             contactsIV.setImageResource(R.mipmap.ic_contacts_n);
+            contactsIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
 //            workplaceIV.setImageResource(R.mipmap.ic_contacts_s);
             if (isShowTabText) {
                 chatTV.setTextColor(ContextCompat.getColor(this, R.color.tab_text_normal));
@@ -366,8 +369,11 @@ public class TabActivity extends WKBaseActivity<ActTabMainBinding> {
             }
         } else {
             chatIV.setImageResource(R.mipmap.ic_chat_n);
+            chatIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
             contactsIV.setImageResource(R.mipmap.ic_contacts_n);
+            contactsIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_normal));
             meIV.setImageResource(R.mipmap.ic_mine_s);
+            meIV.setColorFilter(ContextCompat.getColor(this, R.color.tab_text_selected));
 //            workplaceIV.setImageResource(R.mipmap.ic_contacts_n);
             if (isShowTabText) {
                 chatTV.setTextColor(ContextCompat.getColor(this, R.color.tab_text_normal));

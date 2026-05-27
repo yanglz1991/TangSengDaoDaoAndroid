@@ -186,6 +186,7 @@ object PushNotificationHelper {
      */
     private fun buildDefaultConfig(builder: NotificationCompat.Builder): Notification {
         builder.setSmallIcon(R.mipmap.ic_logo)
+        builder.color = 0xFF007BF9.toInt()
         return builder.build()
     }
 }

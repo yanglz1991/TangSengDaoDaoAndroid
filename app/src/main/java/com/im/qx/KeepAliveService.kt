@@ -101,7 +101,8 @@ class KeepAliveService : Service() {
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(UIKitR.mipmap.ic_logo)
+            .setSmallIcon(R.mipmap.ic_logo)
+            .setColor(0xFF007BF9.toInt())
             .setContentTitle("$appName 正在后台运行")
             .setContentText("用于持续接收新消息通知")
             .setPriority(NotificationCompat.PRIORITY_MIN)
