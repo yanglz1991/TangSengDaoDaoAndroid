@@ -124,7 +124,7 @@
                     android:ellipsize="middle"
                     android:singleLine="true"
                     android:text="@string/app_name"
-                    android:textColor="@color/colorDark"
+                    android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -132,7 +132,7 @@
                     android:id="@+id/subtitleTv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/color999"
+                    android:textColor="#CCFFFFFF"
                     android:textSize="12sp"
                     android:visibility="gone" />
             </LinearLayout>

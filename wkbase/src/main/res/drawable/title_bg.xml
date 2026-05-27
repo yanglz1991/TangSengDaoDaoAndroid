@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    导航栏背景：品牌蓝 #007BF9
+    用于 wk_title_bar_layout / chat_title_layout 以及 frag_contacts / frag_chat_conversation 顶部
+    （fragment 页面下方有 homeColor 内容层覆盖，所以只露出顶部 navbar 区域）
+-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <solid android:color="@color/homeColor" />
+    <solid android:color="#007BF9" />
     <corners android:radius="0dp" />
 
     <gradient
-        android:endColor="@color/homeColor"
-        android:startColor="@color/homeColor" />
+        android:endColor="#007BF9"
+        android:startColor="#007BF9" />
 
 </shape>

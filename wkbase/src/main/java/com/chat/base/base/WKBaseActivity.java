@@ -366,7 +366,8 @@ public abstract class WKBaseActivity<WKVBinding extends ViewBinding> extends Swi
         TextView subtitleTv = findViewById(R.id.subtitleTv);
         setSubtitle(subtitleTv);
         ImageView titleRightIvLeft = findViewById(R.id.titleRightIvLeft);
-        titleRightIvLeft.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.popupTextColor), PorterDuff.Mode.MULTIPLY));
+        // 蓝底标题栏右上角图标统一用 titleBarIcon（白色），与左侧返回按钮一致
+        titleRightIvLeft.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.titleBarIcon), PorterDuff.Mode.MULTIPLY));
         if (getRightIvLeftResourceId(titleRightIvLeft) != -1) {
             titleRightIvLeft.setImageResource(getRightIvLeftResourceId(titleRightIvLeft));
             titleRightIvLeft.setVisibility(View.VISIBLE);
@@ -374,7 +375,7 @@ public abstract class WKBaseActivity<WKVBinding extends ViewBinding> extends Swi
 
         titleRightLayout = findViewById(R.id.titleRightLayout);
         ImageView rightIv = findViewById(R.id.titleRightIv);
-        rightIv.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.popupTextColor), PorterDuff.Mode.MULTIPLY));
+        rightIv.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.titleBarIcon), PorterDuff.Mode.MULTIPLY));
 
         if (getRightIvResourceId(rightIv) != -1) {
             rightIv.setImageResource(getRightIvResourceId(rightIv));
@@ -383,7 +384,8 @@ public abstract class WKBaseActivity<WKVBinding extends ViewBinding> extends Swi
         }
 
         TextView rightTv = findViewById(R.id.titleRightTv);
-        rightTv.setTextColor(Theme.colorAccount);
+        // 蓝底标题栏右上角文字统一用白色（不用 Theme.colorAccount，避免影响全局主题色）
+        rightTv.setTextColor(ContextCompat.getColor(this, R.color.titleBarIcon));
         if (!TextUtils.isEmpty(getRightTvText(rightTv))) {
             rightTv.setText(getRightTvText(rightTv));
             titleRightLayout.setVisibility(View.VISIBLE);

@@ -113,7 +113,7 @@
         android:layout_gravity="center|bottom"
         android:layout_marginBottom="50dp"
         android:gravity="center"
-        android:text=" Copyright © 2026 \nQX 版权所有"
+        android:text=" Copyright © 2026 \n喜聊 版权所有"
         android:textColor="@color/color999"
         android:textSize="12sp" />
 </LinearLayout>

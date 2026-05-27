@@ -108,7 +108,8 @@ public class ChatFragment extends WKBaseFragment<FragChatConversationLayoutBindi
             Typeface face = Typeface.createFromAsset(getResources().getAssets(),
                     "fonts/mw_bold.ttf");
             textView.setTypeface(face);
-            textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.colorDark));
+            // 蓝色 navbar 下文字使用白色
+            textView.setTextColor(0xFFFFFFFF);
             return textView;
         });
         wkVBinding.textSwitcher.setText(getString(R.string.app_name));

@@ -28,7 +28,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="10dp"
-            android:tint="@color/colorDark"
+            android:tint="#FFFFFF"
             android:layout_marginBottom="5dp"
             android:src="@mipmap/ic_ab_back" />
 
@@ -76,7 +76,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:lines="1"
                     android:text="名字"
-                    android:textColor="@color/colorDark"
+                    android:textColor="#FFFFFF"
                     android:textSize="@dimen/font_size_16"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -115,7 +115,7 @@
                     android:id="@+id/subtitleTv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/color999"
+                    android:textColor="#CCFFFFFF"
                     android:textSize="12sp"
                     android:visibility="visible" />
 
@@ -124,7 +124,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:textColor="@color/color999"
+                    android:textColor="#CCFFFFFF"
                     android:textSize="12sp"
                     android:visibility="visible" />
             </LinearLayout>
