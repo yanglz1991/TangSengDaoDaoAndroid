@@ -56,7 +56,7 @@ public class WKAboutActivity extends WKBaseActivity<ActAboutLayoutBinding> {
     @Override
     protected void initListener() {
         wkVBinding.avatarView.setSize(80);
-        wkVBinding.avatarView.showAvatar(WKSystemAccount.system_team, WKChannelType.PERSONAL);
+        wkVBinding.avatarView.imageView.setImageResource(R.mipmap.ic_logo);
     }
 
     private void checkNewVersion(boolean isShowDialog) {
