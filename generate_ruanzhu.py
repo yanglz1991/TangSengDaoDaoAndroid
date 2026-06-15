@@ -116,7 +116,7 @@ def collect_code(root_dir, target_lines_count=3000):
     # 截取前 3000 行
     return code_lines[:target_lines_count]
 
-def generate_pdf(code_lines, pdf_path, app_name_header="禧语安卓 APP V1.0"):
+def generate_pdf(code_lines, pdf_path, app_name_header="禧语 V1.0"):
     """
     使用 ReportLab 生成 PDF 文件，共 60 页，每页 50 行。
     """
@@ -200,4 +200,4 @@ if __name__ == '__main__':
     
     # 生成 PDF
     print("Generating PDF...")
-    generate_pdf(collected_code, pdf_output_path, "禧语安卓 APP V1.0")
+    generate_pdf(collected_code, pdf_output_path, "禧语 V1.0")
