@@ -368,8 +368,7 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
                 }
             }
             if (groupType == WKGroupType.normalGroup) {
-                int count = WKIM.getInstance().getChannelMembersManager().getMemberCount(groupNo, WKChannelType.GROUP);
-                titleTv.setText(String.format("%s(%s)", getString(R.string.chat_info), count));
+                updateTitle();
             }
         });
         //添加群成员监听
@@ -385,8 +384,7 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
                     }
                 }
                 if (groupType == WKGroupType.normalGroup) {
-                    int count = WKIM.getInstance().getChannelMembersManager().getMemberCount(groupNo, WKChannelType.GROUP);
-                    titleTv.setText(String.format("%s(%s)", getString(R.string.chat_info), count));
+                    updateTitle();
 
                     if (memberRole != WKChannelMemberRole.normal) {
                         groupMemberAdapter.addData(groupMemberAdapter.getData().size() - 2, tempList);
@@ -408,8 +406,7 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
     protected void initData() {
         super.initData();
 
-        int count = WKIM.getInstance().getChannelMembersManager().getMemberCount(groupNo, WKChannelType.GROUP);
-        titleTv.setText(getString(R.string.chat_info) + "(" + count + ")");
+        titleTv.setText(getString(R.string.chat_info));
         groupChannel = WKIM.getInstance().getChannelManager().getChannel(groupNo, WKChannelType.GROUP);
         if (groupChannel != null) {
             if (groupChannel.remoteExtraMap != null) {
@@ -417,13 +414,6 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
                     Object groupTypeObject = groupChannel.remoteExtraMap.get(WKChannelExtras.groupType);
                     if (groupTypeObject instanceof Integer) {
                         groupType = (int) groupTypeObject;
-                    }
-                }
-                if (groupType == WKGroupType.superGroup && groupChannel.remoteExtraMap.containsKey(WKChannelCustomerExtras.memberCount)) {
-                    Object memberCountObject = groupChannel.remoteExtraMap.get(WKChannelCustomerExtras.memberCount);
-                    if (memberCountObject instanceof Integer) {
-                        int memberCount = (int) memberCountObject;
-                        titleTv.setText(getString(R.string.chat_info) + "(" + memberCount + ")");
                     }
                 }
             }
@@ -488,6 +478,7 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
             // 始终显示「查看全部群成员」入口，便于通过搜索快速查找群成员
             wkVBinding.showAllMembersTv.setVisibility(View.VISIBLE);
         }
+        updateTitle();
     }
 
     @Override
@@ -557,14 +548,7 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
         wkVBinding.showNickSwitchView.setChecked(groupChannel.showNick == 1);
 
 
-        if (groupType == WKGroupType.superGroup && groupChannel.remoteExtraMap != null && groupChannel.remoteExtraMap.containsKey(WKChannelCustomerExtras.memberCount)) {
-            Object memberCountObject = groupChannel.remoteExtraMap.get(WKChannelCustomerExtras.memberCount);
-            if (memberCountObject instanceof Integer) {
-                int memberCount = (int) memberCountObject;
-                String content = String.format("%s(%s)", getString(R.string.chat_info), memberCount);
-                titleTv.setText(content);
-            }
-        }
+        updateTitle();
     }
 
     private void updateNameInGroupDialog() {
@@ -603,5 +587,25 @@ public class GroupDetailActivity extends WKBaseActivity<ActGroupDetailLayoutBind
 
     private boolean groupIsEnable() {
         return groupChannel != null && groupChannel.status != Const.GroupStatusDisband;
+    }
+
+    // ponytail: 仅群管理/群主可见人数，普通成员只显示"聊天信息"
+    private void updateTitle() {
+        if (memberRole != WKChannelMemberRole.normal) {
+            int count;
+            if (groupType == WKGroupType.superGroup && groupChannel != null && groupChannel.remoteExtraMap != null && groupChannel.remoteExtraMap.containsKey(WKChannelCustomerExtras.memberCount)) {
+                Object memberCountObject = groupChannel.remoteExtraMap.get(WKChannelCustomerExtras.memberCount);
+                if (memberCountObject instanceof Integer) {
+                    count = (int) memberCountObject;
+                } else {
+                    count = WKIM.getInstance().getChannelMembersManager().getMemberCount(groupNo, WKChannelType.GROUP);
+                }
+            } else {
+                count = WKIM.getInstance().getChannelMembersManager().getMemberCount(groupNo, WKChannelType.GROUP);
+            }
+            titleTv.setText(getString(R.string.chat_info) + "(" + count + ")");
+        } else {
+            titleTv.setText(getString(R.string.chat_info));
+        }
     }
 }
