@@ -198,6 +198,14 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
     private final String loginUID = WKConfig.getInstance().getUid();
     private final int callingViewHeight = AndroidUtilities.dp(40f);
     private final int pinnedViewHeight = AndroidUtilities.dp(50f);
+    // ponytail: 部分国产手机激进省电策略会静默杀掉WebSocket连接，SDK心跳检测可能无法及时发现。
+    // 发送消息15秒后若仍处于send_loading，强制重连WebSocket。升级路径：SDK增加连接探活机制后可移除此兜底。
+    private final Handler sendWatchdogHandler = new Handler(Looper.getMainLooper());
+    private Runnable sendWatchdogRunnable;
+    private static final int SEND_WATCHDOG_DELAY_MS = 15_000;
+    // ponytail: 前台时每15秒nudge一次连接，覆盖收消息也静默断连的场景。
+    private Runnable connHealthCheckRunnable;
+    private static final int CONN_HEALTH_CHECK_INTERVAL_MS = 15_000;
 
     private int getTopPinViewHeight() {
         int totalHeight = 0;
@@ -286,6 +294,7 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
         isUploadReadMsg = true;
         chatPanelManager.initRefreshListener();
         EndpointManager.getInstance().invoke("start_screen_shot", this);
+        startConnHealthCheck();
 
         Object addSecurityModule = EndpointManager.getInstance().invoke("add_security_module", null);
         if (addSecurityModule instanceof Boolean) {
@@ -2275,7 +2284,8 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
         }
         MsgModel.getInstance().startCheckFlameMsgTimer();
         saveEditContent();
-
+        stopSendWatchdog();
+        stopConnHealthCheck();
     }
 
     private void saveEditContent() {
@@ -2323,6 +2333,7 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
         WKPlayVoiceUtils.getInstance().stopPlay();
         MsgModel.getInstance().doneReminder(reminderIds);
         EndpointManager.getInstance().invoke("stop_screen_shot", this);
+        stopConnHealthCheck();
     }
 
 
@@ -2385,6 +2396,64 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
                 scrollToEnd();
             }
             isToEnd = true;
+        }
+        if (msg.status == WKSendMsgResult.send_loading) {
+            startSendWatchdog();
+        }
+    }
+
+    // ponytail: 前台周期性连接探活，防止静默断连后收不到消息
+    private void startConnHealthCheck() {
+        stopConnHealthCheck();
+        connHealthCheckRunnable = new Runnable() {
+            @Override
+            public void run() {
+                WKIM.getInstance().getConnectionManager().connection();
+                sendWatchdogHandler.postDelayed(this, CONN_HEALTH_CHECK_INTERVAL_MS);
+            }
+        };
+        sendWatchdogHandler.postDelayed(connHealthCheckRunnable, CONN_HEALTH_CHECK_INTERVAL_MS);
+    }
+
+    private void stopConnHealthCheck() {
+        if (connHealthCheckRunnable != null) {
+            sendWatchdogHandler.removeCallbacks(connHealthCheckRunnable);
+            connHealthCheckRunnable = null;
+        }
+    }
+
+    // ponytail: 15秒兜底重连，扫描adapter中是否仍有send_loading的消息
+    private void startSendWatchdog() {
+        stopSendWatchdog();
+        sendWatchdogRunnable = () -> {
+            boolean hasPending = false;
+            if (chatAdapter != null && WKReader.isNotEmpty(chatAdapter.getData())) {
+                for (WKUIChatMsgItemEntity item : chatAdapter.getData()) {
+                    if (item.wkMsg != null && item.wkMsg.status == WKSendMsgResult.send_loading) {
+                        hasPending = true;
+                        break;
+                    }
+                }
+            }
+            if (hasPending) {
+                WKIM.getInstance().getConnectionManager().disconnect(true);
+                WKIM.getInstance().getConnectionManager().connection();
+            }
+        };
+        sendWatchdogHandler.postDelayed(sendWatchdogRunnable, SEND_WATCHDOG_DELAY_MS);
+    }
+
+    private void stopSendWatchdog() {
+        if (chatAdapter != null && WKReader.isNotEmpty(chatAdapter.getData())) {
+            for (WKUIChatMsgItemEntity item : chatAdapter.getData()) {
+                if (item.wkMsg != null && item.wkMsg.status == WKSendMsgResult.send_loading) {
+                    return;
+                }
+            }
+        }
+        if (sendWatchdogRunnable != null) {
+            sendWatchdogHandler.removeCallbacks(sendWatchdogRunnable);
+            sendWatchdogRunnable = null;
         }
     }
 
@@ -2607,6 +2676,9 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
                 list.get(i).wkMsg.reactionList = wkMsg.reactionList;
                 list.get(i).wkMsg.baseContentMsgModel = wkMsg.baseContentMsgModel;
                 list.get(i).wkMsg.status = wkMsg.status;
+                if (wkMsg.status == WKSendMsgResult.send_success || wkMsg.status == WKSendMsgResult.send_fail) {
+                    stopSendWatchdog();
+                }
                 if (isNotify) {
                     EndpointManager.getInstance().invoke("stop_reaction_animation", null);
                     chatAdapter.notifyItemChanged(i);
