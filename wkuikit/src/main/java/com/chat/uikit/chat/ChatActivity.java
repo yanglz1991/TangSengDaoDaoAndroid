@@ -2266,6 +2266,7 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
         WKIM.getInstance().getCMDManager().removeCmdListener(channelId);
         WKIM.getInstance().getMsgManager().removeSendMsgAckListener(channelId);
         WKIM.getInstance().getMsgManager().removeClearMsg(channelId);
+        WKIM.getInstance().getConnectionManager().removeOnConnectionStatusListener(channelId);
         WKIM.getInstance().getRobotManager().removeRefreshRobotMenu(channelId);
         WKIM.getInstance().getReminderManager().removeNewReminderListener(channelId);
     }
@@ -2286,6 +2287,7 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
         saveEditContent();
         stopSendWatchdog();
         stopConnHealthCheck();
+        sendWatchdogHandler.removeCallbacksAndMessages(null);
     }
 
     private void saveEditContent() {
@@ -2424,7 +2426,7 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
 
     // ponytail: 15秒兜底重连，扫描adapter中是否仍有send_loading的消息
     private void startSendWatchdog() {
-        stopSendWatchdog();
+        if (sendWatchdogRunnable != null) return;
         sendWatchdogRunnable = () -> {
             boolean hasPending = false;
             if (chatAdapter != null && WKReader.isNotEmpty(chatAdapter.getData())) {
@@ -2435,8 +2437,8 @@ public class ChatActivity extends SwipeBackActivity implements IConversationCont
                     }
                 }
             }
+            sendWatchdogRunnable = null;
             if (hasPending) {
-                WKIM.getInstance().getConnectionManager().disconnect(true);
                 WKIM.getInstance().getConnectionManager().connection();
             }
         };
